@@ -12,3 +12,11 @@ Today
 - I will develop the HyDE generation engine with YAML-configurable prompts and settings
 
 ###########################################################################################
+2601290000
+Yesterday
+- Upload feeds.json, students.csv, interactions.csv to BigQuery
+- เขียนโค้ดทดสอบดึงข้อมูลลงมาจาก BigQuery
+- เริ่มพัฒนาโปรเจคให้สามารถทำงานทดสอบการเชื่อมต่อ FastAPI, gemini_api, bigquery
+- upload Project to cloudrun
+
+I create FastAPI that check health - FastAPI - Gemini_key - Bigquery connection - and !!! I deploy it on cloud run what commit I should use???
