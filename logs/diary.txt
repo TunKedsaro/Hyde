@@ -1,0 +1,14 @@
+2601280945
+Yesterday
+- I set up the project structure and deployed the project to Cloud Run
+- I ran ETL for roles and skills into the Gold layer database
+  Yesterday, I attempted to update the table, but I don't have the permission.
+  It might need to be run by you or P'Buth, or I can proceed if permission is granted.
+Today 
+- I will upload the data:
+    - feeds.json
+    - interactions.csv
+    - students.csv
+- I will develop the HyDE generation engine with YAML-configurable prompts and settings
+
+###########################################################################################
