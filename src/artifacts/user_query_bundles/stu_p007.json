@@ -1,0 +1,87 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p007",
+  "generated_at": "2026-01-29T06:30:22+00:00",
+  "prompt_key": "hyde_a",
+  "preferred_language": "th",
+  "num_events": 4,
+  "user_context_json": {
+    "student_id": "stu_p007",
+    "preferred_language": "th",
+    "current_status": "newgrad",
+    "education": {
+      "level": "bachelor",
+      "major": "วิศวกรรมอุตสาหการ"
+    },
+    "target_roles": [
+      {
+        "role_id": "quality_engineer",
+        "role_name": "Quality Engineer",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "statistics",
+        "skill_name": "Statistics",
+        "proficiency": "L1"
+      },
+      {
+        "skill_id": "documentation",
+        "skill_name": "Documentation",
+        "proficiency": "L1"
+      }
+    ],
+    "interests": [
+      "เตรียมสัมภาษณ์",
+      "หางาน"
+    ],
+    "onboard_grp": "Job_Hunter",
+    "onboard_grp_description": "เพิ่งจบและหางานสายคุณภาพ/กระบวนการ"
+  },
+  "user_context_text": "นักศึกษา: วิศวกรรมอุตสาหการ (newgrad)\nเป้าหมายอาชีพ: Quality Engineer\nทักษะ: Statistics:L1;Documentation:L1\nความสนใจ: เตรียมสัมภาษณ์, หางาน\nกลุ่มผู้ใช้: Job_Hunter (เพิ่งจบและหางานสายคุณภาพ/กระบวนการ)\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 4 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- biotech: คะแนน=2.8, เหตุการณ์=2, ไลก์=0, คลิก=1, dwell สูงสุด=0ms\n- data_career: คะแนน=2.0, เหตุการณ์=2, ไลก์=0, คลิก=0, dwell สูงสุด=9000ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_F006 | พื้นฐานสถิติที่ใช้บ่อยในงาน Data Analyst (พร้อมตัวอย่าง) | พื้นฐานสถิติที่ใช้บ่อยในงาน Data Analyst (พร้อมตัวอย่าง)\n- (2) TH_F012 | จาก Data Analyst ไป ML Engineer: โปรเจกต์เริ่มต้นที่ควรทำ | จาก Data Analyst ไป ML Engineer: โปรเจกต์เริ่มต้นที่ควรทำ\n- (3) TH_BIO_051 | เส้นทางอาชีพด้าน Biotechnology สำหรับนักศึกษาไทย: บทบาทและทักษะ | เส้นทางอาชีพด้าน Biotechnology สำหรับนักศึกษาไทย: บทบาทและทักษะ",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "Quality Engineer วิศวกรรมอุตสาหการ หางาน สถิติ",
+        "weight": 1.0,
+        "intent_label": "role_or_skill"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "อาชีพ Data Analyst ทักษะสถิติสำหรับงานข้อมูล การวิเคราะห์ข้อมูล",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "เตรียมสัมภาษณ์ Quality Engineer คำถามสัมภาษณ์งานวิศวกรคุณภาพ",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "Lean Six Sigma สำหรับวิศวกรอุตสาหการ การปรับปรุงกระบวนการผลิต",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "งาน Quality Engineer ในอุตสาหกรรมชีวภาพ การควบคุมคุณภาพยา",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p007_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

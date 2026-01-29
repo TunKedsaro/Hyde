@@ -114,4 +114,3 @@ def load_config() -> Dict[str, Any]:
 
     return cfg
 
-print(load_config())

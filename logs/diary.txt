@@ -14,9 +14,15 @@ Today
 ###########################################################################################
 2601290000
 Yesterday
-- Upload feeds.json, students.csv, interactions.csv to BigQuery
-- เขียนโค้ดทดสอบดึงข้อมูลลงมาจาก BigQuery
-- เริ่มพัฒนาโปรเจคให้สามารถทำงานทดสอบการเชื่อมต่อ FastAPI, gemini_api, bigquery
-- upload Project to cloudrun
+- Uploaded feeds.json, students.csv, and interactions.csv to BigQuery
+- Wrote test code to query data from BigQuery
+- Started developing the project to test end-to-end connectivity between FastAPI, Gemini API, and BigQuery
+- Implemented health-check FastAPI endpoints (FastAPI ↔ Gemini API key ↔ BigQuery)
+- Deployed the health-check service to Cloud Run
 
-I create FastAPI that check health - FastAPI - Gemini_key - Bigquery connection - and !!! I deploy it on cloud run what commit I should use???
+Today
+- Prepare PowerPoint for sprint review
+- Switch input source from Local files to BigQuery
+- Work on embedding pipeline (Local embedding vs embedding service decision)
+
+สรุปเราเลื่อน SprintReview ใช่ไหม

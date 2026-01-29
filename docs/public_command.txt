@@ -1,50 +1,31 @@
-# Dockerfile.dev (Jupyterlab)
-FROM python:3.12-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-WORKDIR /app
-
-RUN apt-get update && apt-get install -y \
-    tree \
-    vim \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-EXPOSE 8888
-
-
-# Dockerfile.dev (FastAPI)
-FROM python:3.12-slim
-
-RUN apt-get update && apt-get install -y apt-transport-https ca-certificates gnupg curl
-
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-
-RUN apt-get update && apt-get install -y git vim net-tools build-essential google-cloud-cli=473.0.0-0
-
-WORKDIR /code
-
-ENV PYTHONPATH=/code/src
-
+###########################################################################################################################
 # Docker command
-docker build -f Dockerfile.dev -t hyde .
+// Docker for FastAPI
+docker build -f Dockerfile.dev -t hyde-fastapi .
+docker run -it --name hyde-fastapi-dev ^
+  -p 4000:4000 ^
+  -v "%cd%:/code" ^
+  -v "%cd%/secrets/poc-piloturl-nonprod-0bdd312b6dbb.json:/secrets/sa.json:ro" ^
+  -e GOOGLE_APPLICATION_CREDENTIALS=/secrets/sa.json ^
+  -e GOOGLE_API_KEY=AIz...IAA ^
+  hyde-fastapi bash
+uvicorn src.main:app --host 0.0.0.0 --port 4000 --reload
 
-docker run -it --name hyde-dev -p 4000:4000 -v %cd%:/code hyde bash
-
-# start jupyter server
+// Docker for Jupyterlab
+docker build -f Dockerfile2.dev -t hyde-jupyter .
+docker run -it --name hyde-jupyter-dev -p 8888:8888 -v "%cd%:/code" -v "%cd%/secrets/poc-piloturl-nonprod-0bdd312b6dbb.json:/secrets/sa.json:ro" -e GOOGLE_APPLICATION_CREDENTIALS=/secrets/sa.json hyde-jupyter bash
 jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root
 
-# start FastAPI server
+// Check GOOGLE_API_KEY & GOOGLE_APPLICATION_CREDENTIALS
+>>> import os
+>>> print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+/secrets/sa.json
+>>> print(os.getenv("GOOGLE_API_KEY"))
+AIz...IAA
 
-
+###########################################################################################################################
 # GCLOUD
+// gcloud initial (before deploy)
 gcloud --version
 
 gcloud init
@@ -56,6 +37,7 @@ gcloud artifacts repositories create hyderecomment \
   --project=poc-piloturl-nonprod \
   --location=asia-southeast1
 
+// old version (Only GOOGLE_API_KEY)
 gcloud builds submit \
   --config=cloudbuild.yaml \
   --project=poc-piloturl-nonprod
@@ -67,6 +49,68 @@ gcloud run deploy hyderecomment-service-v1 \
   --memory=2Gi \
   --cpu=2 \
   --max-instances=5 \
-  --set-env-vars="APP_ENV=prod,GOOGLE_API_KEY=AIza...UIAA" \
+  --set-env-vars="APP_ENV=prod,GOOGLE_API_KEY=AIz...IAA" \
   --allow-unauthenticated
 
+// loging bigquery
+gcloud auth login
+
+gcloud iam service-accounts create connect-bq \
+  --project poc-piloturl-nonprod \
+  --description="Data API service account" \
+  --display-name="connect-bq"
+  
+gcloud iam service-accounts create hyde-bq-sa \
+  --project=poc-piloturl-nonprod
+
+gcloud projects add-iam-policy-binding poc-piloturl-nonprod \
+  --member="serviceAccount:hyde-bq-sa@poc-piloturl-nonprod.iam.gserviceaccount.com" \
+  --role="roles/bigquery.user"
+
+// new version (Both GOOGLE_API_KEY and BigQuery)
+gcloud builds submit \
+  --config=cloudbuild.yaml \
+  --project=poc-piloturl-nonprod
+
+gcloud run deploy hyderecomment-service-v1-1-0 \
+  --image="asia-southeast1-docker.pkg.dev/poc-piloturl-nonprod/hyderecomment/hyderecomment:latest" \
+  --region="asia-southeast1" \
+  --port=4000 \
+  --memory=2Gi \
+  --cpu=2 \
+  --max-instances=5 \
+  --service-account=hyde-bq-sa@poc-piloturl-nonprod.iam.gserviceaccount.com \
+  --set-env-vars="APP_ENV=prod,GOOGLE_API_KEY=AIz...IAA" \
+  --allow-unauthenticated
+
+###########################################################################################################################
+# GIT 
+git reset --hard <branch_id>       # reset back to that version branch
+git restore .                      # git reset file and folder
+
+git checkout -b <branch>
+
+git branch -d dev
+git push origin --delete dev
+
+
+# save logging work
+git checkout feature/logging
+git add .
+git commit -m "wip(logging): save progress"
+
+# docs task
+git checkout dev
+git checkout -b feature/docs
+git push -u origin feature/docs
+# do docs
+git commit -m "docs: update API documentation"
+git push
+
+# merge docs
+git checkout dev
+git merge feature/docs
+git push origin dev
+
+# resume logging
+git checkout feature/logging

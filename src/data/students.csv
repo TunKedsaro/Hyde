@@ -1,0 +1,11 @@
+﻿student_id,preferred_language,current_status,education_level,education_major,target_roles,skills,interests,onboard_grp,onboard_grp_description
+stu_p001,th,student3yr,bachelor,วิทยาการคอมพิวเตอร์,Data Analyst,Python:L2;SQL:L2,ทำพอร์ต;ฝึกสัมภาษณ์,Job_Hunter,เตรียมฝึกงานสายข้อมูล
+stu_p002,th,student2yr,bachelor,เทคโนโลยีชีวภาพ,Biotechnology Researcher|Lab Scientist,Lab Skills:L1;Molecular Biology:L1,ทำวิจัย;ฝึกงานแลบ;สมัครทุน,Learner,อยากทำวิจัยและเตรียมตัวเข้าฝึกงานสายชีวภาพ
+stu_p003,th,student4+yr,bachelor,สถิติ,Data Analyst,Statistics:L2;Excel:L2;Basic SQL:L1,เตรียมเรซูเม่;ฝึกสัมภาษณ์;ทำโปรเจกต์,Job_Hunter,ใกล้จบและอยากสมัครงาน Data Analyst
+stu_p004,th,student4+yr,bachelor,บริหารธุรกิจ,Business Analyst,Excel:L2;Presentation:L1,หางาน;ทำเรซูเม่;ฝึกสัมภาษณ์,Job_Hunter,ใกล้จบและกำลังหางานสายวิเคราะห์ธุรกิจ
+stu_p005,th,student1yr,bachelor,วิทยาการคอมพิวเตอร์,Undecided,Python:L1,สำรวจสายอาชีพ;เรียนรู้พื้นฐาน,Learner,ยังไม่ชัดเจน เป้าหมายคือสำรวจสายงานและสร้างพื้นฐาน
+stu_p006,th,student2yr,bachelor,ชีววิทยา,Biotechnology Intern,Biology Fundamentals:L1;Lab Skills:unknown,ฝึกงาน;ทำพอร์ตสาย Bio;สมัครทุน,Job_Hunter,อยากได้ฝึกงานสายชีวภาพและอยากเตรียมพอร์ต
+stu_p007,th,newgrad,bachelor,วิศวกรรมอุตสาหการ,Quality Engineer,Statistics:L1;Documentation:L1,เตรียมสัมภาษณ์;หางาน,Job_Hunter,เพิ่งจบและหางานสายคุณภาพ/กระบวนการ
+stu_p008,th,student0yr,bachelor,นิเทศศาสตร์,Undecided,Communication:L1,ข่าวมหาวิทยาลัย;กิจกรรม;ทุน,Social,นักศึกษาใหม่ ต้องการข่าวสารมหาวิทยาลัยและโอกาสทุน
+stu_p009,en,student3yr,bachelor,Computer Science,Data Analyst,SQL:L1;Python:L1,portfolio;internship;interview,Job_Hunter,Looking for internship and building a data portfolio (English preference)
+stu_p010,th,student3yr,bachelor,ความสัมพันธ์ระหว่างประเทศ,Policy Analyst,Writing:L1;Research:L1,สมัครทุน;ข่าวมหาวิทยาลัย;เส้นทางอาชีพ,Learner,สนใจทุนและเส้นทางอาชีพด้านนโยบาย (harder match)
