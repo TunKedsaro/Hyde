@@ -1,0 +1,88 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p009",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_b",
+  "preferred_language": "en",
+  "num_events": 5,
+  "user_context_json": {
+    "student_id": "stu_p009",
+    "preferred_language": "en",
+    "current_status": "student3yr",
+    "education": {
+      "level": "bachelor",
+      "major": "Computer Science"
+    },
+    "target_roles": [
+      {
+        "role_id": "data_analyst",
+        "role_name": "Data Analyst",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "sql",
+        "skill_name": "SQL",
+        "proficiency": "L1"
+      },
+      {
+        "skill_id": "python",
+        "skill_name": "Python",
+        "proficiency": "L1"
+      }
+    ],
+    "interests": [
+      "portfolio",
+      "internship",
+      "interview"
+    ],
+    "onboard_grp": "Job_Hunter",
+    "onboard_grp_description": "Looking for internship and building a data portfolio (English preference)"
+  },
+  "user_context_text": "Student major: Computer Science (student3yr).\nTarget roles: Data Analyst.\nSkills: SQL:L1;Python:L1.\nInterests: portfolio, internship, interview.\nOnboard group: Job_Hunter (Looking for internship and building a data portfolio (English preference)).\nLanguage: English.",
+  "history_summary_text": "Summary of last 30 days (total 5 events):\nHighest engagement themes:\n- data_career: score=6.8, events=5, likes=0, clicks=1, max_dwell_ms=36000\nRecent interacted feeds (truncated):\n- (1) EN_F028 | How to Build a Strong Data Analytics Portfolio | How to Build a Strong Data Analytics Portfolio\n- (2) EN_F027 | SQL Interview Questions for Entry-Level Data Analysts | SQL Interview Questions for Entry-Level Data Analysts\n- (3) EN_F029 | Data Analyst Internship Interview Prep: SQL + Case Study | Data Analyst Internship Interview Prep: SQL + Case Study",
+  "hyde_output": {
+    "output_language": "en",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "build strong data analytics portfolio for entry level",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "SQL interview questions for entry level data analyst",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "data analyst internship interview case study preparation",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "python skills for data analyst career path",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "data analyst portfolio project ideas for beginners",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p009_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

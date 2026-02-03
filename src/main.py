@@ -28,14 +28,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-### Health & Metadata #######################################################
-### Health & Metadata.API:01 ################################################
 @app.get(
     "/", 
     tags=["Health & Metadata"],
+    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+)
+
+def root_status():
+    return {
+        "response":"ok"
+    }
+
+### Health & Metadata #######################################################
+### Health & Metadata.API:01 ################################################
+@app.get(
+    "/health/", 
+    tags=["Health & Metadata"],
     description="API:01 Basic health check endpoint for uptime monitoring."
 )
-def health_fastapi():
+def health_check():
     start_time  = time()
     finish_time = time()
     process_time = finish_time - start_time
@@ -52,13 +63,14 @@ import os
 
 
 ### Health & Metadata.API:01 ################################################
+
 @app.get(
     "/health/gemini", 
     tags=["Health & Metadata"],
     description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
 )
 
-def health_gemini():
+def gemini_health_check():
     start_time  = time()
     client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
     resp = client.models.generate_content(
@@ -96,7 +108,7 @@ def get_user_events(user_id: str):
     tags=["Health & Metadata"],
     description="API:02 Bq -> project -> FastAPI"
 )
-def health_bq():
+def bigquery_health_check():
     start_time  = time()
     finish_time = time()
     process_time = finish_time - start_time
@@ -105,3 +117,45 @@ def health_bq():
         "body": get_user_events("stu_p001"),
         "response_time" : f"{process_time:.5f} s"
         }
+
+
+@app.get(
+    "/hyde/students/batch", 
+    tags=["Hyde Generator"],
+    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+)
+
+def generate_batch_recommendations():
+    return {
+        "response":"ok"
+    }
+
+@app.post(
+    "/hyde/students/{student_id}", 
+    tags=["Hyde Generator"],
+    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+)
+
+def generate_student_recommendation():
+    return {
+        "response":"ok"
+    }
+
+@app.post(
+    "/hyde/students/{student_id}/feed", 
+    tags=["Fetch results"],
+    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+)
+
+def get_student_feed():
+    return {
+        "student_id":"stu_p000",
+        "metadata":"...",
+        "embedding":{
+            "embedding1":"...",
+            "embedding2":"...",
+            "embedding3":"...",
+            "embedding4":"...",
+            "embedding5":"..."
+        }
+    }

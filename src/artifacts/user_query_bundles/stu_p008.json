@@ -1,0 +1,83 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p008",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_b",
+  "preferred_language": "th",
+  "num_events": 5,
+  "user_context_json": {
+    "student_id": "stu_p008",
+    "preferred_language": "th",
+    "current_status": "student0yr",
+    "education": {
+      "level": "bachelor",
+      "major": "นิเทศศาสตร์"
+    },
+    "target_roles": [
+      {
+        "role_id": "undecided",
+        "role_name": "Undecided",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "communication",
+        "skill_name": "Communication",
+        "proficiency": "L1"
+      }
+    ],
+    "interests": [
+      "ข่าวมหาวิทยาลัย",
+      "กิจกรรม",
+      "ทุน"
+    ],
+    "onboard_grp": "Social",
+    "onboard_grp_description": "นักศึกษาใหม่ ต้องการข่าวสารมหาวิทยาลัยและโอกาสทุน"
+  },
+  "user_context_text": "นักศึกษา: นิเทศศาสตร์ (student0yr)\nเป้าหมายอาชีพ: Undecided\nทักษะ: Communication:L1\nความสนใจ: ข่าวมหาวิทยาลัย, กิจกรรม, ทุน\nกลุ่มผู้ใช้: Social (นักศึกษาใหม่ ต้องการข่าวสารมหาวิทยาลัยและโอกาสทุน)\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 5 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- scholarship: คะแนน=4.0, เหตุการณ์=3, ไลก์=0, คลิก=1, dwell สูงสุด=15000ms\n- university: คะแนน=2.2, เหตุการณ์=2, ไลก์=0, คลิก=0, dwell สูงสุด=12000ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_UNI_043 | อัปเดตกิจกรรมวิชาการ สัมมนา และเวิร์กช็อปสำหรับนักศึกษา | อัปเดตกิจกรรมวิชาการ สัมมนา และเวิร์กช็อปสำหรับนักศึกษา\n- (2) TH_UNI_049 | ปฏิทินกิจกรรมและวันสำคัญของนักศึกษา: สิ่งที่ควรรู้ตลอดปี | ปฏิทินกิจกรรมและวันสำคัญของนักศึกษา: สิ่งที่ควรรู้ตลอดปี\n- (3) TH_SCH_031 | รวมทุนป.ตรีสำหรับนักศึกษาไทย (อัปเดตรอบล่าสุด) | รวมทุนป.ตรีสำหรับนักศึกษาไทย (อัปเดตรอบล่าสุด)\n- (4) TH_SCH_036 | เช็กลิสต์สมัครทุนในมหาวิทยาลัย: เตรียมอะไรบ้างก่อนยื่น | เช็กลิสต์สมัครทุนในมหาวิทยาลัย: เตรียมอะไรบ้างก่อนยื่น",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "ทุนการศึกษาสำหรับนักศึกษามหาวิทยาลัยล่าสุด",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "อัปเดตกิจกรรมและข่าวสารภายในมหาวิทยาลัย",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "ขั้นตอนการสมัครทุนการศึกษาสำหรับนักศึกษาใหม่",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "เวิร์กช็อปพัฒนาทักษะการสื่อสารสำหรับนักศึกษา",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "โอกาสฝึกงานสำหรับนักศึกษานิเทศศาสตร์ปีหนึ่ง",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p008_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

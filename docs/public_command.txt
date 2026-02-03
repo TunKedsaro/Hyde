@@ -93,7 +93,6 @@ git checkout -b <branch>
 git branch -d dev
 git push origin --delete dev
 
-
 # save logging work
 git checkout feature/logging
 git add .
@@ -111,6 +110,10 @@ git push
 git checkout dev
 git merge feature/docs
 git push origin dev
+
+# remove branch
+git branch -d dev
+git push origin --delete dev
 
 # resume logging
 git checkout feature/logging

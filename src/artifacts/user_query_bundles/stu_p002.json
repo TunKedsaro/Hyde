@@ -1,0 +1,93 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p002",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_b",
+  "preferred_language": "th",
+  "num_events": 7,
+  "user_context_json": {
+    "student_id": "stu_p002",
+    "preferred_language": "th",
+    "current_status": "student2yr",
+    "education": {
+      "level": "bachelor",
+      "major": "เทคโนโลยีชีวภาพ"
+    },
+    "target_roles": [
+      {
+        "role_id": "biotechnology_researcher",
+        "role_name": "Biotechnology Researcher",
+        "priority": 1
+      },
+      {
+        "role_id": "lab_scientist",
+        "role_name": "Lab Scientist",
+        "priority": 2
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "lab_skills",
+        "skill_name": "Lab Skills",
+        "proficiency": "L1"
+      },
+      {
+        "skill_id": "molecular_biology",
+        "skill_name": "Molecular Biology",
+        "proficiency": "L1"
+      }
+    ],
+    "interests": [
+      "ทำวิจัย",
+      "ฝึกงานแลบ",
+      "สมัครทุน"
+    ],
+    "onboard_grp": "Learner",
+    "onboard_grp_description": "อยากทำวิจัยและเตรียมตัวเข้าฝึกงานสายชีวภาพ"
+  },
+  "user_context_text": "นักศึกษา: เทคโนโลยีชีวภาพ (student2yr)\nเป้าหมายอาชีพ: Biotechnology Researcher, Lab Scientist\nทักษะ: Lab Skills:L1;Molecular Biology:L1\nความสนใจ: ทำวิจัย, ฝึกงานแลบ, สมัครทุน\nกลุ่มผู้ใช้: Learner (อยากทำวิจัยและเตรียมตัวเข้าฝึกงานสายชีวภาพ)\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 7 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- biotech: คะแนน=6.8, เหตุการณ์=5, ไลก์=0, คลิก=1, dwell สูงสุด=47000ms\n- scholarship: คะแนน=2.8, เหตุการณ์=2, ไลก์=0, คลิก=0, dwell สูงสุด=28000ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_BIO_051 | เส้นทางอาชีพด้าน Biotechnology สำหรับนักศึกษาไทย: บทบาทและทักษะ | เส้นทางอาชีพด้าน Biotechnology สำหรับนักศึกษาไทย: บทบาทและทักษะ\n- (2) TH_BIO_052 | จะเรียน Biotechnology ต้องพร้อมอะไร: พื้นฐานที่ควรรู้ | จะเรียน Biotechnology ต้องพร้อมอะไร: พื้นฐานที่ควรรู้\n- (3) TH_BIO_055 | ทักษะห้องแล็บที่สาย Bio ควรมี: รายการสำคัญและการฝึกฝน | ทักษะห้องแล็บที่สาย Bio ควรมี: รายการสำคัญและการฝึกฝน\n- (4) TH_BIO_054 | รวมที่ฝึกงานสาย Biotechnology ในไทย: ภาครัฐ เอกชน สตาร์ทอัพ | รวมที่ฝึกงานสาย Biotechnology ในไทย: ภาครัฐ เอกชน สตาร์ทอัพ\n- (5) TH_SCH_035 | ทุนเรียนต่อโท-เอกสายวิทย์/เทค/วิศวะ: เลือกทุนให้เหมาะกับแผน | ทุนเรียนต่อโท-เอกสายวิทย์/เทค/วิศวะ: เลือกทุนให้เหมาะกับแผน",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "ทักษะที่จำเป็นสำหรับนักวิจัยเทคโนโลยีชีวภาพ",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "ทุนการศึกษาต่อต่างประเทศสำหรับสาขาเทคโนโลยีชีวภาพ",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "วิธีเตรียมตัวสมัครฝึกงานแล็บเทคโนโลยีชีวภาพ",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "เทคนิคการวิจัยทางชีวโมเลกุลสำหรับนักศึกษา",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "แนวโน้มงานวิจัยเทคโนโลยีชีวภาพในอนาคต",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p002_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p004",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_b",
+  "preferred_language": "th",
+  "num_events": 6,
+  "user_context_json": {
+    "student_id": "stu_p004",
+    "preferred_language": "th",
+    "current_status": "student4+yr",
+    "education": {
+      "level": "bachelor",
+      "major": "บริหารธุรกิจ"
+    },
+    "target_roles": [
+      {
+        "role_id": "business_analyst",
+        "role_name": "Business Analyst",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "excel",
+        "skill_name": "Excel",
+        "proficiency": "L2"
+      },
+      {
+        "skill_id": "presentation",
+        "skill_name": "Presentation",
+        "proficiency": "L1"
+      }
+    ],
+    "interests": [
+      "หางาน",
+      "ทำเรซูเม่",
+      "ฝึกสัมภาษณ์"
+    ],
+    "onboard_grp": "Job_Hunter",
+    "onboard_grp_description": "ใกล้จบและกำลังหางานสายวิเคราะห์ธุรกิจ"
+  },
+  "user_context_text": "นักศึกษา: บริหารธุรกิจ (student4+yr)\nเป้าหมายอาชีพ: Business Analyst\nทักษะ: Excel:L2;Presentation:L1\nความสนใจ: หางาน, ทำเรซูเม่, ฝึกสัมภาษณ์\nกลุ่มผู้ใช้: Job_Hunter (ใกล้จบและกำลังหางานสายวิเคราะห์ธุรกิจ)\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 6 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- data_career: คะแนน=7.4, เหตุการณ์=6, ไลก์=0, คลิก=1, dwell สูงสุด=18000ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_F010 | แนวทางสมัครงาน/ฝึกงานสาย Data: จัดลำดับบริษัทและเตรียมเอกสาร | แนวทางสมัครงาน/ฝึกงานสาย Data: จัดลำดับบริษัทและเตรียมเอกสาร\n- (2) TH_F020 | How-to: เตรียมพอร์ตให้ผ่าน ATS สำหรับสาย Data | How-to: เตรียมพอร์ตให้ผ่าน ATS สำหรับสาย Data\n- (3) TH_F013 | โครงสร้างพอร์ต 1 หน้า: ใส่อะไรบ้างให้ recruiter เห็นเร็ว | โครงสร้างพอร์ต 1 หน้า: ใส่อะไรบ้างให้ recruiter เห็นเร็ว\n- (4) TH_F022 | Checklist ก่อนส่งสมัครฝึกงาน: พอร์ต เรซูเม่ GitHub LinkedIn | Checklist ก่อนส่งสมัครฝึกงาน: พอร์ต เรซูเม่ GitHub LinkedIn",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "แนวทางเตรียมเรซูเม่และพอร์ตสำหรับสมัครงาน Business Analyst",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "เทคนิคการสร้างเรซูเม่ให้ผ่านระบบ ATS สำหรับสายงาน Data",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "เตรียมตัวสัมภาษณ์งานตำแหน่ง Business Analyst คำถามที่พบบ่อย",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "ตัวอย่างโปรเจกต์และ Case Study สำหรับ Business Analyst มือใหม่",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "ทักษะและเครื่องมือสำคัญที่ Business Analyst ควรมีเพื่อความก้าวหน้า",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p004_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

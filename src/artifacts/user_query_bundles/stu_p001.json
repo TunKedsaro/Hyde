@@ -1,0 +1,87 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p001",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_b",
+  "preferred_language": "th",
+  "num_events": 9,
+  "user_context_json": {
+    "student_id": "stu_p001",
+    "preferred_language": "th",
+    "current_status": "student3yr",
+    "education": {
+      "level": "bachelor",
+      "major": "วิทยาการคอมพิวเตอร์"
+    },
+    "target_roles": [
+      {
+        "role_id": "data_analyst",
+        "role_name": "Data Analyst",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "python",
+        "skill_name": "Python",
+        "proficiency": "L2"
+      },
+      {
+        "skill_id": "sql",
+        "skill_name": "SQL",
+        "proficiency": "L2"
+      }
+    ],
+    "interests": [
+      "ทำพอร์ต",
+      "ฝึกสัมภาษณ์"
+    ],
+    "onboard_grp": "Job_Hunter",
+    "onboard_grp_description": "เตรียมฝึกงานสายข้อมูล"
+  },
+  "user_context_text": "นักศึกษา: วิทยาการคอมพิวเตอร์ (student3yr)\nเป้าหมายอาชีพ: Data Analyst\nทักษะ: Python:L2;SQL:L2\nความสนใจ: ทำพอร์ต, ฝึกสัมภาษณ์\nกลุ่มผู้ใช้: Job_Hunter (เตรียมฝึกงานสายข้อมูล)\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 9 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- data_career: คะแนน=12.7, เหตุการณ์=9, ไลก์=1, คลิก=1, dwell สูงสุด=52000ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_F001 | แนวทางทำพอร์ต Data Analyst ด้วยโปรเจกต์ Python และ SQL | แนวทางทำพอร์ต Data Analyst ด้วยโปรเจกต์ Python และ SQL\n- (2) TH_F003 | เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst (SQL + Python) | เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst (SQL + Python)\n- (3) TH_F009 | โปรเจกต์ Python วิเคราะห์ข้อมูลจริง: ตั้งแต่ทำความสะอาดถึงสรุป insight | โปรเจกต์ Python วิเคราะห์ข้อมูลจริง: ตั้งแต่ทำความสะอาดถึงสรุป insight\n- (4) TH_F008 | รวมโจทย์ SQL ฝึกสัมภาษณ์ระดับฝึกงาน (พร้อมเฉลยแนวคิด) | รวมโจทย์ SQL ฝึกสัมภาษณ์ระดับฝึกงาน (พร้อมเฉลยแนวคิด)\n- (5) TH_F017 | Portfolio Project: วิเคราะห์ยอดขาย + สร้าง KPI Dashboard | Portfolio Project: วิเคราะห์ยอดขาย + สร้าง KPI Dashboard",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "แนวทางสร้างพอร์ต Data Analyst และเตรียมสัมภาษณ์ฝึกงาน",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "โปรเจกต์ Python SQL สำหรับ Data Analyst พร้อมตัวอย่างจริง",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "โจทย์ฝึก SQL Python สำหรับสัมภาษณ์ Data Analyst พร้อมเฉลย",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "การสร้าง Dashboard และ Data Visualization สำหรับ Data Analyst",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "เส้นทางอาชีพ Data Analyst และทักษะที่จำเป็นในสายงานข้อมูล",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p001_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

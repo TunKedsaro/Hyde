@@ -1,0 +1,88 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p006",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_b",
+  "preferred_language": "th",
+  "num_events": 6,
+  "user_context_json": {
+    "student_id": "stu_p006",
+    "preferred_language": "th",
+    "current_status": "student2yr",
+    "education": {
+      "level": "bachelor",
+      "major": "ชีววิทยา"
+    },
+    "target_roles": [
+      {
+        "role_id": "biotechnology_intern",
+        "role_name": "Biotechnology Intern",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "biology_fundamentals",
+        "skill_name": "Biology Fundamentals",
+        "proficiency": "L1"
+      },
+      {
+        "skill_id": "lab_skills",
+        "skill_name": "Lab Skills",
+        "proficiency": "unknown"
+      }
+    ],
+    "interests": [
+      "ฝึกงาน",
+      "ทำพอร์ตสาย Bio",
+      "สมัครทุน"
+    ],
+    "onboard_grp": "Job_Hunter",
+    "onboard_grp_description": "อยากได้ฝึกงานสายชีวภาพและอยากเตรียมพอร์ต"
+  },
+  "user_context_text": "นักศึกษา: ชีววิทยา (student2yr)\nเป้าหมายอาชีพ: Biotechnology Intern\nทักษะ: Biology Fundamentals:L1;Lab Skills:unknown\nความสนใจ: ฝึกงาน, ทำพอร์ตสาย Bio, สมัครทุน\nกลุ่มผู้ใช้: Job_Hunter (อยากได้ฝึกงานสายชีวภาพและอยากเตรียมพอร์ต)\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 6 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- scholarship: คะแนน=4.0, เหตุการณ์=3, ไลก์=0, คลิก=1, dwell สูงสุด=23000ms\n- biotech: คะแนน=3.8, เหตุการณ์=3, ไลก์=0, คลิก=0, dwell สูงสุด=39000ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_BIO_058 | จัดพอร์ตสาย Bio เพื่อสมัครฝึกงาน/ทุน: ต้องมีอะไรบ้าง | จัดพอร์ตสาย Bio เพื่อสมัครฝึกงาน/ทุน: ต้องมีอะไรบ้าง\n- (2) TH_BIO_054 | รวมที่ฝึกงานสาย Biotechnology ในไทย: ภาครัฐ เอกชน สตาร์ทอัพ | รวมที่ฝึกงานสาย Biotechnology ในไทย: ภาครัฐ เอกชน สตาร์ทอัพ\n- (3) TH_BIO_055 | ทักษะห้องแล็บที่สาย Bio ควรมี: รายการสำคัญและการฝึกฝน | ทักษะห้องแล็บที่สาย Bio ควรมี: รายการสำคัญและการฝึกฝน\n- (4) TH_SCH_033 | ทุนแลกเปลี่ยนต่างประเทศ: เช็คก่อนสมัคร (ระยะสั้น/ยาว) | ทุนแลกเปลี่ยนต่างประเทศ: เช็คก่อนสมัคร (ระยะสั้น/ยาว)\n- (5) TH_SCH_036 | เช็กลิสต์สมัครทุนในมหาวิทยาลัย: เตรียมอะไรบ้างก่อนยื่น | เช็กลิสต์สมัครทุนในมหาวิทยาลัย: เตรียมอะไรบ้างก่อนยื่น",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "จัดพอร์ตสมัครฝึกงานสายชีวภาพและทุนการศึกษา",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "รวมที่ฝึกงานไบโอเทคในไทยและทักษะแล็บที่จำเป็น",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "เทคนิคสัมภาษณ์งานฝึกงานสายชีวภาพให้ได้งาน",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "เทคโนโลยีชีวภาพใหม่ๆ ที่น่าสนใจสำหรับนักศึกษา",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "การพัฒนาทักษะห้องปฏิบัติการชีววิทยาขั้นสูง",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p006_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

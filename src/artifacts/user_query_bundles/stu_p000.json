@@ -1,0 +1,92 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p000",
+  "generated_at": "2026-02-03T08:48:11+00:00",
+  "prompt_key": "hyde_a",
+  "preferred_language": "en",
+  "num_events": 4,
+  "user_context_json": {
+    "student_id": "stu_p000",
+    "preferred_language": "en",
+    "current_status": "student",
+    "education": {
+      "level": "bachelor",
+      "major": "electrical engineering"
+    },
+    "target_roles": [
+      {
+        "role_id": "data_science",
+        "role_name": "data science",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "python",
+        "skill_name": "python",
+        "proficiency": "unknown"
+      },
+      {
+        "skill_id": "sql",
+        "skill_name": "sql",
+        "proficiency": "unknown"
+      },
+      {
+        "skill_id": "statistics",
+        "skill_name": "statistics",
+        "proficiency": "unknown"
+      }
+    ],
+    "interests": [
+      "machine learning",
+      "career growth"
+    ],
+    "onboard_grp": "job_hunter",
+    "onboard_grp_description": "looking to transition into data science role"
+  },
+  "user_context_text": "Student major: electrical engineering (student).\nTarget roles: data science.\nSkills: python;sql;statistics.\nInterests: machine learning, career growth.\nOnboard group: job_hunter (looking to transition into data science role).\nLanguage: English.",
+  "history_summary_text": "Summary of last 30 days (total 4 events):\nHighest engagement themes:\n- data_career: score=4.3, events=3, likes=1, clicks=0, max_dwell_ms=52000\n- university: score=1.2, events=1, likes=0, clicks=0, max_dwell_ms=12000\nRecent interacted feeds (truncated):\n- (1) TH_F001 | แนวทางทำพอร์ต Data Analyst ด้วยโปรเจกต์ Python และ SQL | แนวทางทำพอร์ต Data Analyst ด้วยโปรเจกต์ Python และ SQL\n- (2) TH_UNI_043 | อัปเดตกิจกรรมวิชาการ สัมมนา และเวิร์กช็อปสำหรับนักศึกษา | อัปเดตกิจกรรมวิชาการ สัมมนา และเวิร์กช็อปสำหรับนักศึกษา\n- (3) TH_F003 | เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst (SQL + Python) | เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst (SQL + Python)",
+  "hyde_output": {
+    "output_language": "en",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "data science roles python sql statistics machine learning",
+        "weight": 1.0,
+        "intent_label": "role_or_skill"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "data analyst portfolio projects python sql",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "data science job application strategies for beginners",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "deep learning concepts for data science beginners",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "data science industry trends career growth opportunities",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p000_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

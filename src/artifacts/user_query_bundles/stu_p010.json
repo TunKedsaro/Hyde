@@ -1,0 +1,88 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p010",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_a",
+  "preferred_language": "th",
+  "num_events": 3,
+  "user_context_json": {
+    "student_id": "stu_p010",
+    "preferred_language": "th",
+    "current_status": "student3yr",
+    "education": {
+      "level": "bachelor",
+      "major": "ความสัมพันธ์ระหว่างประเทศ"
+    },
+    "target_roles": [
+      {
+        "role_id": "policy_analyst",
+        "role_name": "Policy Analyst",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "writing",
+        "skill_name": "Writing",
+        "proficiency": "L1"
+      },
+      {
+        "skill_id": "research",
+        "skill_name": "Research",
+        "proficiency": "L1"
+      }
+    ],
+    "interests": [
+      "สมัครทุน",
+      "ข่าวมหาวิทยาลัย",
+      "เส้นทางอาชีพ"
+    ],
+    "onboard_grp": "Learner",
+    "onboard_grp_description": "สนใจทุนและเส้นทางอาชีพด้านนโยบาย (harder match)"
+  },
+  "user_context_text": "นักศึกษา: ความสัมพันธ์ระหว่างประเทศ (student3yr)\nเป้าหมายอาชีพ: Policy Analyst\nทักษะ: Writing:L1;Research:L1\nความสนใจ: สมัครทุน, ข่าวมหาวิทยาลัย, เส้นทางอาชีพ\nกลุ่มผู้ใช้: Learner (สนใจทุนและเส้นทางอาชีพด้านนโยบาย (harder match))\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 3 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- data_career: คะแนน=3.2, เหตุการณ์=2, ไลก์=0, คลิก=0, dwell สูงสุด=60000ms\n- biotech: คะแนน=1.5, เหตุการณ์=1, ไลก์=1, คลิก=0, dwell สูงสุด=0ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_F015 | แนะนำ GitHub สำหรับพอร์ตสาย Data: จัด repo และ README อย่างไร | แนะนำ GitHub สำหรับพอร์ตสาย Data: จัด repo และ README อย่างไร\n- (2) TH_BIO_055 | ทักษะห้องแล็บที่สาย Bio ควรมี: รายการสำคัญและการฝึกฝน | ทักษะห้องแล็บที่สาย Bio ควรมี: รายการสำคัญและการฝึกฝน",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "นักวิเคราะห์นโยบาย ทักษะที่จำเป็น เส้นทางอาชีพ",
+        "weight": 1.0,
+        "intent_label": "role_or_skill"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "สายงานข้อมูล การสร้างพอร์ตโฟลิโอสำหรับนักศึกษา",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "ทุนการศึกษาต่างประเทศ สำหรับนักศึกษารัฐศาสตร์ ความสัมพันธ์ระหว่างประเทศ",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "นโยบายต่างประเทศ การวิเคราะห์นโยบายระหว่างประเทศ การเขียนรายงาน",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "ฝึกงานองค์กรระหว่างประเทศ โอกาสทำงานด้านนโยบาย สาขาความสัมพันธ์ระหว่างประเทศ",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p010_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}

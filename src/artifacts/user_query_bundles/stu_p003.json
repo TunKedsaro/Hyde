@@ -1,0 +1,93 @@
+{
+  "bundle_version": "v2_hyde_embedded_queries",
+  "student_id": "stu_p003",
+  "generated_at": "2026-02-02T09:47:24+00:00",
+  "prompt_key": "hyde_b",
+  "preferred_language": "th",
+  "num_events": 7,
+  "user_context_json": {
+    "student_id": "stu_p003",
+    "preferred_language": "th",
+    "current_status": "student4+yr",
+    "education": {
+      "level": "bachelor",
+      "major": "สถิติ"
+    },
+    "target_roles": [
+      {
+        "role_id": "data_analyst",
+        "role_name": "Data Analyst",
+        "priority": 1
+      }
+    ],
+    "skills": [
+      {
+        "skill_id": "statistics",
+        "skill_name": "Statistics",
+        "proficiency": "L2"
+      },
+      {
+        "skill_id": "excel",
+        "skill_name": "Excel",
+        "proficiency": "L2"
+      },
+      {
+        "skill_id": "basic_sql",
+        "skill_name": "Basic SQL",
+        "proficiency": "L1"
+      }
+    ],
+    "interests": [
+      "เตรียมเรซูเม่",
+      "ฝึกสัมภาษณ์",
+      "ทำโปรเจกต์"
+    ],
+    "onboard_grp": "Job_Hunter",
+    "onboard_grp_description": "ใกล้จบและอยากสมัครงาน Data Analyst"
+  },
+  "user_context_text": "นักศึกษา: สถิติ (student4+yr)\nเป้าหมายอาชีพ: Data Analyst\nทักษะ: Statistics:L2;Excel:L2;Basic SQL:L1\nความสนใจ: เตรียมเรซูเม่, ฝึกสัมภาษณ์, ทำโปรเจกต์\nกลุ่มผู้ใช้: Job_Hunter (ใกล้จบและอยากสมัครงาน Data Analyst)\nภาษา: ไทย",
+  "history_summary_text": "สรุปพฤติกรรม 30 วันล่าสุด (รวม 7 เหตุการณ์):\nธีมที่มีการมีส่วนร่วมสูง:\n- data_career: คะแนน=9.2, เหตุการณ์=7, ไลก์=0, คลิก=1, dwell สูงสุด=34000ms\nฟีดล่าสุดที่มีปฏิสัมพันธ์ (ตัดสั้น):\n- (1) TH_F006 | พื้นฐานสถิติที่ใช้บ่อยในงาน Data Analyst (พร้อมตัวอย่าง) | พื้นฐานสถิติที่ใช้บ่อยในงาน Data Analyst (พร้อมตัวอย่าง)\n- (2) TH_F007 | วิธีเล่าโปรเจกต์ Data ให้โดนใจในการสัมภาษณ์ (STAR + Business Impact) | วิธีเล่าโปรเจกต์ Data ให้โดนใจในการสัมภาษณ์ (STAR + Business Impact)\n- (3) TH_F011 | ทำ A/B Testing แบบเข้าใจง่ายสำหรับโปรเจกต์นักศึกษา | ทำ A/B Testing แบบเข้าใจง่ายสำหรับโปรเจกต์นักศึกษา\n- (4) TH_F008 | รวมโจทย์ SQL ฝึกสัมภาษณ์ระดับฝึกงาน (พร้อมเฉลยแนวคิด) | รวมโจทย์ SQL ฝึกสัมภาษณ์ระดับฝึกงาน (พร้อมเฉลยแนวคิด)\n- (5) TH_F003 | เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst (SQL + Python) | เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst (SQL + Python)",
+  "hyde_output": {
+    "output_language": "th",
+    "hyde_queries": [
+      {
+        "query_id": "Q1",
+        "query_text": "เทคนิคสัมภาษณ์งาน Data Analyst คำถาม SQL สถิติ",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q2",
+        "query_text": "วิธีเล่าโปรเจกต์ Data Analyst ให้โดดเด่นในการสัมภาษณ์",
+        "weight": 1.0,
+        "intent_label": "history_aligned"
+      },
+      {
+        "query_id": "Q3",
+        "query_text": "ตัวอย่างเรซูเม่ Data Analyst สำหรับนักศึกษาจบใหม่",
+        "weight": 1.0,
+        "intent_label": "practical"
+      },
+      {
+        "query_id": "Q4",
+        "query_text": "เรียนรู้ Python สำหรับงาน Data Analyst เบื้องต้น",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      },
+      {
+        "query_id": "Q5",
+        "query_text": "สร้าง Portfolio Data Analyst โชว์ทักษะสำหรับสมัครงาน",
+        "weight": 0.6,
+        "intent_label": "exploratory"
+      }
+    ]
+  },
+  "hyde_query_embeddings": {
+    "path": "stu_p003_hyde_q_emb.npy",
+    "model": "gemini-embedding-001",
+    "dim": 768,
+    "dtype": "float32",
+    "num_queries": 5,
+    "normalized": true
+  }
+}
