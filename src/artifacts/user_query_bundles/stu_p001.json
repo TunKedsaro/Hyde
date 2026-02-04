@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p001",
-  "generated_at": "2026-02-02T09:47:24+00:00",
+  "generated_at": "2026-02-04T02:41:59+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 9,
@@ -46,31 +46,31 @@
     "hyde_queries": [
       {
         "query_id": "Q1",
-        "query_text": "แนวทางสร้างพอร์ต Data Analyst และเตรียมสัมภาษณ์ฝึกงาน",
+        "query_text": "แนวทางสร้างพอร์ต Data Analyst โปรเจกต์ Python SQL",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q2",
-        "query_text": "โปรเจกต์ Python SQL สำหรับ Data Analyst พร้อมตัวอย่างจริง",
+        "query_text": "เตรียมสัมภาษณ์ฝึกงาน Data Analyst โจทย์ SQL Python",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "โจทย์ฝึก SQL Python สำหรับสัมภาษณ์ Data Analyst พร้อมเฉลย",
+        "query_text": "หางานฝึกงาน Data Analyst สำหรับนักศึกษาวิทยาการคอมพิวเตอร์",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "การสร้าง Dashboard และ Data Visualization สำหรับ Data Analyst",
+        "query_text": "เทคนิคสร้าง Dashboard วิเคราะห์ข้อมูลด้วย Python Tableau",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "เส้นทางอาชีพ Data Analyst และทักษะที่จำเป็นในสายงานข้อมูล",
+        "query_text": "พื้นฐาน Machine Learning สำหรับ Data Analyst Python",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

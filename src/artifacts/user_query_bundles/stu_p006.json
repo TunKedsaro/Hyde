@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p006",
-  "generated_at": "2026-02-02T09:47:24+00:00",
+  "generated_at": "2026-02-04T02:41:59+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 6,
@@ -53,25 +53,25 @@
       },
       {
         "query_id": "Q2",
-        "query_text": "รวมที่ฝึกงานไบโอเทคในไทยและทักษะแล็บที่จำเป็น",
+        "query_text": "โอกาสฝึกงาน Biotechnology ทักษะห้องแล็บที่จำเป็น",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "เทคนิคสัมภาษณ์งานฝึกงานสายชีวภาพให้ได้งาน",
+        "query_text": "วิธีพัฒนาทักษะห้องแล็บสำหรับนักศึกษาชีววิทยา",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "เทคโนโลยีชีวภาพใหม่ๆ ที่น่าสนใจสำหรับนักศึกษา",
+        "query_text": "เส้นทางอาชีพนักชีววิทยาเทคโนโลยีชีวภาพหลังเรียนจบ",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "การพัฒนาทักษะห้องปฏิบัติการชีววิทยาขั้นสูง",
+        "query_text": "เตรียมตัวสัมภาษณ์ฝึกงานสาย Biotechnology ให้ได้งาน",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

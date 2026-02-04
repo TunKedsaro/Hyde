@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from time import time
-
+from src.functions.core.cloudstorage import GoogleCloudStorage
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",
@@ -27,6 +27,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+
+
 
 @app.get(
     "/", 
@@ -141,21 +146,74 @@ def generate_student_recommendation():
         "response":"ok"
     }
 
+cgs = GoogleCloudStorage(bucket_name = "hyde-datalake-feeds")
+
 @app.post(
     "/hyde/students/{student_id}/feed", 
     tags=["Fetch results"],
     description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
 )
 
-def get_student_feed():
+def get_student_feed(student_id):
+    metadata = cgs.read_json(f"{student_id}/metadata/metadata.json")
+    emb1     = cgs.read_npy(f"{student_id}/embedding/embedding01.npy")
+    emb2     = cgs.read_npy(f"{student_id}/embedding/embedding02.npy")
+    emb3     = cgs.read_npy(f"{student_id}/embedding/embedding03.npy")
+    emb4     = cgs.read_npy(f"{student_id}/embedding/embedding04.npy")
+    emb5     = cgs.read_npy(f"{student_id}/embedding/embedding05.npy")
     return {
-        "student_id":"stu_p000",
-        "metadata":"...",
-        "embedding":{
-            "embedding1":"...",
-            "embedding2":"...",
-            "embedding3":"...",
-            "embedding4":"...",
-            "embedding5":"..."
+        "student_id":student_id,
+        "metadata":metadata,
+        "embedded_vector":{
+            "emb1":emb1.tolist(),
+            "emb2":emb2.tolist(),
+            "emb3":emb3.tolist(),
+            "emb4":emb4.tolist(),
+            "emb5":emb5.tolist()
         }
     }
+
+
+{
+    "student_id": "stu_p003",
+    "metadata": {
+        "student_id": "stu_p003",
+        "current_status": "student4+yr",
+        "education_level": "bachelor",
+        "education_major": "สถิติ",
+        "target_roles": "Data Analyst",
+        "timezone": "UTC",
+        "model_name": "gemini-2.5-flash",
+        "max_output_tokens": 2048,
+        "feed_text_max_chars": 240,
+        "temperature": 0.2
+    },
+    "embedded_vector": {
+        "emb1": [
+            0.0003576562739908695,
+            ...
+            -0.02179572731256485,
+    ],    
+        "emb2": [
+            0.0003576562739908695,
+            ...
+            -0.02179572731256485,
+    ],   
+        "emb3": [
+            0.0003576562739908695,
+            ...
+            -0.02179572731256485,
+    ],   
+        "emb4": [
+            0.0003576562739908695,
+            ...
+            -0.02179572731256485,
+    ],   
+        "emb5": [
+            0.0003576562739908695,
+            ...
+            -0.02179572731256485,
+    ]
+    }
+} 
+

@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p009",
-  "generated_at": "2026-02-02T09:47:24+00:00",
+  "generated_at": "2026-02-04T02:41:59+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "en",
   "num_events": 5,
@@ -47,31 +47,31 @@
     "hyde_queries": [
       {
         "query_id": "Q1",
-        "query_text": "build strong data analytics portfolio for entry level",
+        "query_text": "build strong data analytics portfolio for entry level jobs",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q2",
-        "query_text": "SQL interview questions for entry level data analyst",
+        "query_text": "data analyst internship interview preparation SQL case study questions",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "data analyst internship interview case study preparation",
+        "query_text": "data analyst portfolio projects for computer science students",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "python skills for data analyst career path",
+        "query_text": "essential python skills for data analysis and visualization",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "data analyst portfolio project ideas for beginners",
+        "query_text": "resume tips for data analyst internship applications entry level",
         "weight": 0.6,
         "intent_label": "exploratory"
       }
