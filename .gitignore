@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 secrets/
 src/parameters/credentials.yaml
+.Trash-0/

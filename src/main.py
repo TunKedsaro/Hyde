@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from time import time
-from src.functions.core.cloudstorage import GoogleCloudStorage
+from functions.utils.cloudstorage import GoogleCloudStorage
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",
@@ -174,46 +174,46 @@ def get_student_feed(student_id):
     }
 
 
-{
-    "student_id": "stu_p003",
-    "metadata": {
-        "student_id": "stu_p003",
-        "current_status": "student4+yr",
-        "education_level": "bachelor",
-        "education_major": "สถิติ",
-        "target_roles": "Data Analyst",
-        "timezone": "UTC",
-        "model_name": "gemini-2.5-flash",
-        "max_output_tokens": 2048,
-        "feed_text_max_chars": 240,
-        "temperature": 0.2
-    },
-    "embedded_vector": {
-        "emb1": [
-            0.0003576562739908695,
-            ...
-            -0.02179572731256485,
-    ],    
-        "emb2": [
-            0.0003576562739908695,
-            ...
-            -0.02179572731256485,
-    ],   
-        "emb3": [
-            0.0003576562739908695,
-            ...
-            -0.02179572731256485,
-    ],   
-        "emb4": [
-            0.0003576562739908695,
-            ...
-            -0.02179572731256485,
-    ],   
-        "emb5": [
-            0.0003576562739908695,
-            ...
-            -0.02179572731256485,
-    ]
-    }
-} 
+# {
+#     "student_id": "stu_p003",
+#     "metadata": {
+#         "student_id": "stu_p003",
+#         "current_status": "student4+yr",
+#         "education_level": "bachelor",
+#         "education_major": "สถิติ",
+#         "target_roles": "Data Analyst",
+#         "timezone": "UTC",
+#         "model_name": "gemini-2.5-flash",
+#         "max_output_tokens": 2048,
+#         "feed_text_max_chars": 240,
+#         "temperature": 0.2
+#     },
+#     "embedded_vector": {
+#         "emb1": [
+#             0.0003576562739908695,
+#             ...
+#             -0.02179572731256485,
+#     ],    
+#         "emb2": [
+#             0.0003576562739908695,
+#             ...
+#             -0.02179572731256485,
+#     ],   
+#         "emb3": [
+#             0.0003576562739908695,
+#             ...
+#             -0.02179572731256485,
+#     ],   
+#         "emb4": [
+#             0.0003576562739908695,
+#             ...
+#             -0.02179572731256485,
+#     ],   
+#         "emb5": [
+#             0.0003576562739908695,
+#             ...
+#             -0.02179572731256485,
+#     ]
+#     }
+# } 
 

@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p001",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-06T08:49:03+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 9,
@@ -52,25 +52,25 @@
       },
       {
         "query_id": "Q2",
-        "query_text": "เตรียมสัมภาษณ์ฝึกงาน Data Analyst โจทย์ SQL Python",
+        "query_text": "เทคนิคเตรียมสัมภาษณ์ Data Analyst โจทย์ SQL Python",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "หางานฝึกงาน Data Analyst สำหรับนักศึกษาวิทยาการคอมพิวเตอร์",
+        "query_text": "ไอเดียโปรเจกต์ Data Analyst สร้างพอร์ตฝึกงาน",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "เทคนิคสร้าง Dashboard วิเคราะห์ข้อมูลด้วย Python Tableau",
+        "query_text": "เครื่องมือ Data Visualization สำหรับ Data Analyst",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "พื้นฐาน Machine Learning สำหรับ Data Analyst Python",
+        "query_text": "ทักษะสำคัญ Data Analyst นอกจาก Python SQL",
         "weight": 0.6,
         "intent_label": "exploratory"
       }
