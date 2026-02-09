@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p001",
-  "generated_at": "2026-02-06T08:49:03+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 9,
@@ -52,25 +52,25 @@
       },
       {
         "query_id": "Q2",
-        "query_text": "เทคนิคเตรียมสัมภาษณ์ Data Analyst โจทย์ SQL Python",
+        "query_text": "เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst โจทย์ SQL Python",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "ไอเดียโปรเจกต์ Data Analyst สร้างพอร์ตฝึกงาน",
+        "query_text": "ไอเดียโปรเจกต์วิเคราะห์ข้อมูลสำหรับพอร์ต Data Analyst",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "เครื่องมือ Data Visualization สำหรับ Data Analyst",
+        "query_text": "การสร้างแดชบอร์ดข้อมูลด้วยเครื่องมือยอดนิยมสำหรับ Data Analyst",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "ทักษะสำคัญ Data Analyst นอกจาก Python SQL",
+        "query_text": "เทคนิคทำความสะอาดข้อมูลและเตรียมข้อมูลสำหรับงาน Data Analyst",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

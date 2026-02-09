@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p002",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 7,
@@ -58,25 +58,25 @@
       },
       {
         "query_id": "Q2",
-        "query_text": "รวมทุนการศึกษาสำหรับฝึกงานวิจัยเทคโนโลยีชีวภาพในต่างประเทศ",
+        "query_text": "รวมแหล่งฝึกงานเทคโนโลยีชีวภาพในไทย โอกาสทำงานวิจัย",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "วิธีพัฒนาทักษะห้องแล็บชีวภาพสำหรับนักศึกษาปีสอง",
+        "query_text": "วิธีเตรียมตัวสมัครฝึกงานแล็บชีวภาพ ทุนการศึกษาต่อ",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "เทคนิคการวิจัยชีวโมเลกุลขั้นสูงสำหรับนักวิทยาศาสตร์รุ่นใหม่",
+        "query_text": "เทคนิคชีวโมเลกุลขั้นสูงสำหรับนักวิจัย การทำวิจัยในห้องปฏิบัติการ",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "โอกาสการทำงานวิจัยด้านพันธุวิศวกรรมในสถาบันวิจัยชั้นนำ",
+        "query_text": "นวัตกรรมเทคโนโลยีชีวภาพล่าสุด โอกาสงานวิจัยในอนาคต",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

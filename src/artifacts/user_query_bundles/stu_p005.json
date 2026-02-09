@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p005",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_a",
   "preferred_language": "th",
   "num_events": 4,
@@ -41,31 +41,31 @@
     "hyde_queries": [
       {
         "query_id": "Q1",
-        "query_text": "นักศึกษาวิทยาการคอมพิวเตอร์ Python พื้นฐาน",
+        "query_text": "นักศึกษาวิทยาการคอมพิวเตอร์ Python",
         "weight": 1.0,
         "intent_label": "role_or_skill"
       },
       {
         "query_id": "Q2",
-        "query_text": "เส้นทางอาชีพ Data Analyst สำหรับนักศึกษา Python วิเคราะห์ข้อมูล",
+        "query_text": "เส้นทางอาชีพ Data Analyst สำหรับนักศึกษา",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "โปรเจกต์ Python สำหรับนักศึกษาเริ่มต้น วิเคราะห์ข้อมูล ฝึกงาน",
+        "query_text": "โปรเจกต์ Python สำหรับนักศึกษาเริ่มต้น",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "อาชีพ Data Scientist Machine Learning AI สำหรับนักศึกษา",
+        "query_text": "Data Scientist อาชีพสำหรับนักศึกษาวิทยาการคอมพิวเตอร์",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "อาชีพ Software Engineer Web Developer Python พัฒนาเว็บไซต์",
+        "query_text": "พื้นฐานการเขียนโปรแกรมสำหรับนักศึกษาวิทยาการคอมพิวเตอร์",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

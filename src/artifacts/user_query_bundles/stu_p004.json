@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p004",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 6,
@@ -47,31 +47,31 @@
     "hyde_queries": [
       {
         "query_id": "Q1",
-        "query_text": "เทคนิคเตรียมพอร์ตสมัครงานสาย Data ให้ผ่าน ATS",
+        "query_text": "แนวทางการเตรียมเรซูเม่และพอร์ตโฟลิโอสำหรับตำแหน่ง Business Analyst",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q2",
-        "query_text": "แนวทางเขียนเรซูเม่สมัครงาน Business Analyst",
+        "query_text": "เคล็ดลับการเตรียมตัวสัมภาษณ์งาน Business Analyst ให้ประสบความสำเร็จ",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "เทคนิคตอบคำถามสัมภาษณ์งาน Business Analyst",
+        "query_text": "ตำแหน่งงาน Business Analyst ที่เปิดรับสมัครและคุณสมบัติที่ต้องการ",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "พัฒนาทักษะ Excel สำหรับ Business Analyst มือใหม่",
+        "query_text": "ทักษะ Excel ขั้นสูงที่จำเป็นสำหรับ Business Analyst ในปัจจุบัน",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "สร้างเครือข่ายมืออาชีพบน LinkedIn เพื่อหางาน",
+        "query_text": "เครื่องมือและเทคนิคการนำเสนอข้อมูลสำหรับ Business Analyst มือใหม่",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

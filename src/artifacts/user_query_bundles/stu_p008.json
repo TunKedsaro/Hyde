@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p008",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 5,
@@ -42,31 +42,31 @@
     "hyde_queries": [
       {
         "query_id": "Q1",
-        "query_text": "ทุนการศึกษาสำหรับนักศึกษาใหม่ในมหาวิทยาลัย",
+        "query_text": "ทุนการศึกษาสำหรับนักศึกษาใหม่",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q2",
-        "query_text": "กิจกรรมและข่าวสารมหาวิทยาลัยสำหรับนักศึกษาปีหนึ่ง",
+        "query_text": "กิจกรรมและเวิร์กช็อปน่าสนใจในมหาวิทยาลัย",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "ขั้นตอนการสมัครทุนการศึกษาและเตรียมเอกสาร",
+        "query_text": "ขั้นตอนการสมัครทุนการศึกษาในมหาวิทยาลัย",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "ชมรมและกิจกรรมนิเทศศาสตร์ที่น่าสนใจสำหรับนักศึกษา",
+        "query_text": "ข่าวสารและประกาศสำคัญสำหรับนักศึกษานิเทศศาสตร์",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "เวิร์กช็อปพัฒนาทักษะการสื่อสารเพื่อการทำงานในอนาคต",
+        "query_text": "โอกาสฝึกงานและพัฒนาทักษะสำหรับนักศึกษาปีหนึ่ง",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

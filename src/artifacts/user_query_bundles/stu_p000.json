@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p000",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_a",
   "preferred_language": "en",
   "num_events": 4,
@@ -51,31 +51,31 @@
     "hyde_queries": [
       {
         "query_id": "Q1",
-        "query_text": "data science career path for electrical engineering students",
+        "query_text": "data science career path python sql statistics",
         "weight": 1.0,
         "intent_label": "role_or_skill"
       },
       {
         "query_id": "Q2",
-        "query_text": "data analyst portfolio projects python sql interview tips",
+        "query_text": "data analyst portfolio projects python sql interview prep",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "how to build a data science resume for job applications",
+        "query_text": "entry level data science jobs python sql machine learning",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "machine learning algorithms for data science beginners projects",
+        "query_text": "machine learning applications electrical engineering career transition",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "career growth strategies for data scientists in tech industry",
+        "query_text": "data science career growth strategies for students",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

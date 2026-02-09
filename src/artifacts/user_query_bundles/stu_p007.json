@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p007",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_a",
   "preferred_language": "th",
   "num_events": 4,
@@ -52,25 +52,25 @@
       },
       {
         "query_id": "Q2",
-        "query_text": "เส้นทางอาชีพ Data Analyst สำหรับวิศวกรอุตสาหการ",
+        "query_text": "สถิติสำหรับงานวิเคราะห์ข้อมูลและเส้นทางอาชีพ Data Analyst",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "เตรียมสัมภาษณ์งานวิศวกรคุณภาพสำหรับนักศึกษาจบใหม่",
+        "query_text": "เตรียมตัวสัมภาษณ์งานวิศวกรคุณภาพสำหรับนักศึกษาจบใหม่",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "หลักการ Lean Six Sigma สำหรับวิศวกรอุตสาหการ",
+        "query_text": "การปรับปรุงกระบวนการผลิตและ Lean Six Sigma สำหรับวิศวกร",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "โอกาสงานวิศวกรอุตสาหการในอุตสาหกรรมต่างๆ",
+        "query_text": "ระบบบริหารคุณภาพ ISO และการจัดทำเอกสารคุณภาพ",
         "weight": 0.6,
         "intent_label": "exploratory"
       }

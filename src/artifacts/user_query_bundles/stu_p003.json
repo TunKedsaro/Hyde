@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p003",
-  "generated_at": "2026-02-04T02:41:59+00:00",
+  "generated_at": "2026-02-08T18:14:34+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 7,
@@ -52,31 +52,31 @@
     "hyde_queries": [
       {
         "query_id": "Q1",
-        "query_text": "เทคนิคเตรียมสัมภาษณ์งาน Data Analyst พร้อมตัวอย่างคำถาม",
+        "query_text": "เตรียมตัวสัมภาษณ์งาน Data Analyst",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q2",
-        "query_text": "การสร้างโปรเจกต์ Data Analyst สำหรับนักศึกษาจบใหม่",
+        "query_text": "โจทย์ SQL สำหรับสัมภาษณ์งาน Data Analyst พร้อมเฉลย",
         "weight": 1.0,
         "intent_label": "history_aligned"
       },
       {
         "query_id": "Q3",
-        "query_text": "วิธีเขียนเรซูเม่ Data Analyst ให้โดดเด่นและน่าสนใจ",
+        "query_text": "สร้างเรซูเม่และพอร์ตโฟลิโอ Data Analyst ให้โดดเด่น",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "การนำเสนอข้อมูลด้วย Visualization Tools สำหรับ Data Analyst",
+        "query_text": "เทคนิคการวิเคราะห์ข้อมูลด้วย Excel สำหรับ Data Analyst",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "ทักษะการสื่อสารและเล่าเรื่องข้อมูลสำหรับ Data Analyst",
+        "query_text": "การนำเสนอข้อมูลเชิงลึกสำหรับโปรเจกต์ Data Analyst",
         "weight": 0.6,
         "intent_label": "exploratory"
       }
