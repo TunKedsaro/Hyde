@@ -1,7 +1,7 @@
 {
   "bundle_version": "v2_hyde_embedded_queries",
   "student_id": "stu_p001",
-  "generated_at": "2026-02-08T18:14:34+00:00",
+  "generated_at": "2026-02-09T13:14:48+00:00",
   "prompt_key": "hyde_b",
   "preferred_language": "th",
   "num_events": 9,
@@ -58,19 +58,19 @@
       },
       {
         "query_id": "Q3",
-        "query_text": "ไอเดียโปรเจกต์วิเคราะห์ข้อมูลสำหรับพอร์ต Data Analyst",
+        "query_text": "ไอเดียโปรเจกต์ Data Analyst สำหรับพอร์ตฝึกงาน",
         "weight": 1.0,
         "intent_label": "practical"
       },
       {
         "query_id": "Q4",
-        "query_text": "การสร้างแดชบอร์ดข้อมูลด้วยเครื่องมือยอดนิยมสำหรับ Data Analyst",
+        "query_text": "เครื่องมือสร้างแดชบอร์ดข้อมูล Power BI Tableau",
         "weight": 0.6,
         "intent_label": "exploratory"
       },
       {
         "query_id": "Q5",
-        "query_text": "เทคนิคทำความสะอาดข้อมูลและเตรียมข้อมูลสำหรับงาน Data Analyst",
+        "query_text": "แนวโน้มอาชีพ Data Analyst ทักษะที่ตลาดต้องการ",
         "weight": 0.6,
         "intent_label": "exploratory"
       }
