@@ -11,7 +11,7 @@ import io
 from datetime import datetime, timedelta, timezone
 from google.cloud import storage
 
-from functions.utils.bigquery import DataQuery
+from src.functions.utils.bigquery import DataQuery
 
 class GoogleCloudStorage:
     '''

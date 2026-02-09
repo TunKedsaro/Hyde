@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from time import time
-from functions.utils.cloudstorage import GoogleCloudStorage
+from src.functions.utils.cloudstorage import GoogleCloudStorage
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",
@@ -146,32 +146,32 @@ def generate_student_recommendation():
         "response":"ok"
     }
 
-cgs = GoogleCloudStorage(bucket_name = "hyde-datalake-feeds")
+# cgs = GoogleCloudStorage(bucket_name = "hyde-datalake-feeds")
 
-@app.post(
-    "/hyde/students/{student_id}/feed", 
-    tags=["Fetch results"],
-    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
-)
+# @app.post(
+#     "/hyde/students/{student_id}/feed", 
+#     tags=["Fetch results"],
+#     description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+# )
 
-def get_student_feed(student_id):
-    metadata = cgs.read_json(f"{student_id}/metadata/metadata.json")
-    emb1     = cgs.read_npy(f"{student_id}/embedding/embedding01.npy")
-    emb2     = cgs.read_npy(f"{student_id}/embedding/embedding02.npy")
-    emb3     = cgs.read_npy(f"{student_id}/embedding/embedding03.npy")
-    emb4     = cgs.read_npy(f"{student_id}/embedding/embedding04.npy")
-    emb5     = cgs.read_npy(f"{student_id}/embedding/embedding05.npy")
-    return {
-        "student_id":student_id,
-        "metadata":metadata,
-        "embedded_vector":{
-            "emb1":emb1.tolist(),
-            "emb2":emb2.tolist(),
-            "emb3":emb3.tolist(),
-            "emb4":emb4.tolist(),
-            "emb5":emb5.tolist()
-        }
-    }
+# def get_student_feed(student_id):
+#     metadata = cgs.read_json(f"{student_id}/metadata/metadata.json")
+#     emb1     = cgs.read_npy(f"{student_id}/embedding/embedding01.npy")
+#     emb2     = cgs.read_npy(f"{student_id}/embedding/embedding02.npy")
+#     emb3     = cgs.read_npy(f"{student_id}/embedding/embedding03.npy")
+#     emb4     = cgs.read_npy(f"{student_id}/embedding/embedding04.npy")
+#     emb5     = cgs.read_npy(f"{student_id}/embedding/embedding05.npy")
+#     return {
+#         "student_id":student_id,
+#         "metadata":metadata,
+#         "embedded_vector":{
+#             "emb1":emb1.tolist(),
+#             "emb2":emb2.tolist(),
+#             "emb3":emb3.tolist(),
+#             "emb4":emb4.tolist(),
+#             "emb5":emb5.tolist()
+#         }
+#     }
 
 
 # {
@@ -217,3 +217,100 @@ def get_student_feed(student_id):
 #     }
 # } 
 
+gcs = GoogleCloudStorage(bucket_name="hyde-datalake-feeds")
+
+@app.post(
+    "/hyde/students/{student_id}/feed", 
+    tags=["Fetch results"],
+    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+)
+
+def get_student_feed(student_id):
+    results = gcs.retrieve_student_bundle(student_id)
+    return {
+        "student_id":student_id,
+        "status":results["status"],
+        "metadata":results["metadata"],
+        "hyde":{
+            "hyde_context1":results["hyde"]["hyde_text01.txt"],
+            "hyde_context2":results["hyde"]["hyde_text02.txt"],
+            "hyde_context3":results["hyde"]["hyde_text03.txt"],
+            "hyde_context4":results["hyde"]["hyde_text04.txt"],
+            "hyde_context5":results["hyde"]["hyde_text05.txt"],
+        },
+        "embedded_vector":{
+            "embedding_vector1":results["embeddings"]['embedding01.npy'].tolist(),
+            "embedding_vector2":results["embeddings"]['embedding02.npy'].tolist(),
+            "embedding_vector3":results["embeddings"]['embedding03.npy'].tolist(),
+            "embedding_vector4":results["embeddings"]['embedding04.npy'].tolist(),
+            "embedding_vector5":results["embeddings"]['embedding05.npy'].tolist()
+        }
+    }
+
+# {
+#   "student_id": "stu_p001",
+#   "status": '''
+# hyde-datalake /
+# |- stu_p001 /
+#   |- metadata folder /
+#     |- metadata.json /
+#   |- hyde folder /
+#     |- stu_p001/hyde/hyde_text01.txt /
+#     |- stu_p001/hyde/hyde_text02.txt /
+#     |- stu_p001/hyde/hyde_text03.txt x
+#     |- stu_p001/hyde/hyde_text04.txt /
+#     |- stu_p001/hyde/hyde_text05.txt /
+#   |- embedding folder /
+#     |- stu_p001/embedding/embedding01.npy /
+#     |- stu_p001/embedding/embedding02.npy /
+#     |- stu_p001/embedding/embedding03.npy /
+#     |- stu_p001/embedding/embedding04.npy /
+#     |- stu_p001/embedding/embedding05.npy /
+#     ''',
+#   "metadata": {
+#     "student_id": "stu_p001",
+#     "current_status": "student3yr",
+#     "education_level": "bachelor",
+#     "education_major": "วิทยาการคอมพิวเตอร์",
+#     "target_roles": "Data Analyst",
+#     "timezone": "UTC",
+#     "model_name": "gemini-2.5-flash",
+#     "max_output_tokens": 2048,
+#     "feed_text_max_chars": 240,
+#     "temperature": 0.2
+#   },
+#   "hyde": {
+#     "hyde_context1": "แนวทางสร้างพอร์ต Data Analyst โปรเจกต์ Python SQL",
+#     "hyde_context2": "เทคนิคเตรียมสัมภาษณ์ฝึกงาน Data Analyst โจทย์ SQL Python",
+#     "hyde_context3": "",
+#     "hyde_context4": "เครื่องมือสร้างแดชบอร์ดข้อมูล Power BI Tableau",
+#     "hyde_context5": "แนวโน้มอาชีพ Data Analyst ทักษะที่ตลาดต้องการ"
+#   },
+#   "embedded_vector": {
+#     "embedding_vector1": [
+#       0.018953053280711174,
+#       -0.009550142101943493,
+#       0.005990269593894482
+#     ],
+#     "embedding_vector2": [
+#       0.007405612617731094,
+#       -0.03062768094241619,
+#       0.0034155375324189663
+#     ],
+#     "embedding_vector3": [
+#       0.015558813698589802,
+#       0.006979266181588173,
+#       0.0075002312660217285
+#     ],
+#     "embedding_vector4": [
+#       0.001261499710381031,
+#       0.019617965444922447,
+#       0.012513278052210808
+#     ],
+#     "embedding_vector5": [
+#       -0.0200442373752594,
+#       0.004771450534462929,
+#       -0.00016345674521289766
+#     ]
+#   }
+# }
