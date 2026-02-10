@@ -158,16 +158,171 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             out.append(str(it.get("query_text") or "").strip())
         return out
     
+    def _upload_to_cgs(self,student_id,metadata,embedding,hyde):
+        self.cgs.upload_json(
+            blob_path   = f"{student_id}/metadata/metadata.json",
+            json_data   = metadata
+        )
+        self.cgs.upload_npy(
+            blob_path   = f"{student_id}/embedding/embedding01.npy",
+            array       = embedding[0]
+        )
+        self.cgs.upload_npy(
+            blob_path   = f"{student_id}/embedding/embedding02.npy",
+            array       = embedding[1]
+        )
+        self.cgs.upload_npy(
+            blob_path   = f"{student_id}/embedding/embedding03.npy",
+            array       = embedding[2]
+        )
+        self.cgs.upload_npy(
+            blob_path   = f"{student_id}/embedding/embedding04.npy",
+            array       = embedding[3]
+        )
+        self.cgs.upload_npy(
+            blob_path   = f"{student_id}/embedding/embedding05.npy",
+            array       = embedding[4]
+        )
+        self.cgs.upload_text(
+            blob_path = f"{student_id}/hyde/hyde_text01.txt",
+            text_data = hyde[0]
+        )
+        self.cgs.upload_text(
+            blob_path = f"{student_id}/hyde/hyde_text02.txt",
+            text_data = hyde[1]
+        )
+        self.cgs.upload_text(
+            blob_path = f"{student_id}/hyde/hyde_text03.txt",
+            text_data = hyde[2]
+        )
+        self.cgs.upload_text(
+            blob_path = f"{student_id}/hyde/hyde_text04.txt",
+            text_data = hyde[3]
+        )
+        self.cgs.upload_text(
+            blob_path = f"{student_id}/hyde/hyde_text05.txt",
+            text_data = hyde[4]
+        )
+    
+    ### ---------- main pipeline ---------- ###
     def batch_student_generator(self):
-        pass
-
-    def single_student_generator(self,student_id:str):
         status = "Complete"
+        student_id_updated:list = []
         try:
             ### ----------- initail value ----------- ###
             students     = self.dq.get_students()             # TODO : change this method to overwrite for case () and identify student id to reduce time
             interactions = self.dq.get_interactions()         # TODO : change this method to overwrite for case () and identify student id to reduce time
             feeds_lookup = self.dq.get_user_events_json()     # TODO : change this method to overwrite for case () and identify student id to reduce time
+            now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+            ### ----------- read HyDe-related configureation once ----------- ###
+            history_threshold,recent_k,feed_text_max_chars,include_recent_feeds,query_embedding_model_name = self._read_hyde_config(self.cfg)
+            expected_dim = int(self.cfg.get("embeddings", {}).get("dim", 0) or 0)
+            ### ----------- Hyde prompt ----------- ###
+            prompts = self._load_prompts()
+            if not prompts:
+                raise ValueError("hyde_prompts missing from parameters/prompts.yaml")
+            client = build_llm_client_from_yaml(
+                parameters_path=str(PROJECT_ROOT / "parameters" / "parameters.yaml")
+                )
+            ### ----------- Generate one cached bundle per student ---------- ###
+            for _, row in students.iterrows():
+                ### ---------- 01 locate student row ---------- ###
+                student_row = row.to_dict()     # convert pd -> dict for each row
+                student_id  = str(student_row.get("student_id","")).strip()
+                ### ---------- 02 build context ---------- ###
+                user_ctx = build_user_context(student_row)
+                pref_lang = user_ctx.user_context_json.get("preferred_language","th")
+                user_events = interactions[interactions["user_id"] == student_id]   # <- user event from interaction.csv
+                num_events  = int(len(user_events))
+                if num_events > 0:
+                    history_summary_text = build_history_summary(
+                        user_events,
+                        preferred_language   = pref_lang,
+                        include_recent_feeds = include_recent_feeds,
+                        recent_k             = recent_k,
+                        feeds_lookup         = feeds_lookup or None,
+                        feed_text_max_chars  = feed_text_max_chars,
+                    )
+                ### ---------- 03 build prompt ---------- ###
+                prompt_key = self._choose_hyde_prompt_key(num_events,history_threshold)
+                template = prompts.get(prompt_key)
+                if not template:
+                    raise ValueError(f"Missing prompt '{prompt_key}' in pormpts.yaml")
+                prompt = self._render_prompt(
+                        template=template,
+                        preferred_language=pref_lang,
+                        user_context_text=user_ctx.user_context_text,
+                        history_summary_text=history_summary_text,
+                    )
+                ### ---------- 04 LLM call ---------- ###
+                hyde_json = client.generate_json(prompt)
+                ### ---------- 05 Shin embedding ---------- ###
+                hyde_query_texts = self._extract_hyde_query_texts(hyde_json)
+
+                if hyde_query_texts:
+                    emb = embed_texts_gemini(
+                        texts=hyde_query_texts,
+                        output_dim=768,
+                        task_type="RETRIEVAL_DOCUMENT",
+                    )
+                    if emb.ndim != 2:
+                        raise ValueError(f"Invalid embedding shape {emb.shape}")
+                    dim = int(emb.shape[1])
+                else:
+                    dim = expected_dim or 0
+                    emb = np.zeros((0, dim), dtype=np.float32)
+                ### ---------- 06 save bundle locally ---------- ###
+                bundle = {
+                    "bundle_version": "v2_hyde_embedded_queries",
+                    "student_id": student_id,
+                    "generated_at": now_iso,
+                    "prompt_key": prompt_key,
+                    "preferred_language": pref_lang,
+                    "num_events": num_events,
+                    "user_context_json": user_ctx.user_context_json,
+                    "user_context_text": user_ctx.user_context_text,
+                    "history_summary_text": history_summary_text,
+                    "hyde_output": hyde_json,
+                }
+                if self.verbose:
+                    print(bundle)
+
+                ### ---------- 07 upload to GCS ---------- ###
+                self.cgs.create_folder(f"{student_id}/metadata/")
+                self.cgs.create_folder(f"{student_id}/hyde/")
+                self.cgs.create_folder(f"{student_id}/embedding/")
+
+                metadata = {
+                    "student_id"          :student_id, # 
+                    "current_status"      :student_row['current_status'], #
+                    "education_level"     :student_row['education_level'], #
+                    "education_major"     :student_row['education_major'], #
+                    "target_roles"        :student_row['target_roles'], #
+                    "timezone"            :self.cfg["app"]["timezone"], #
+                    "model_name"          :self.cfg["llm"]["model_name"], #
+                    "max_output_tokens"   :self.cfg["llm"]["max_output_tokens"], #
+                    "feed_text_max_chars" :self.cfg["hyde"]["feed_text_max_chars"], #
+                    "temperature"         :self.cfg["llm"]["temperature"] #
+                }
+                
+                self._upload_to_cgs(
+                    student_id = student_id,
+                    metadata   = metadata,
+                    embedding  = emb,
+                    hyde       = hyde_query_texts
+                )
+        except:
+            status = "Fail"
+
+        return student_id_updated,status
+    
+    def single_student_generator(self,student_id:str):
+        status = "Complete"
+        try:
+            ### ----------- initail value ----------- ###
+            students     = self.dq.get_students(student_id)       # TODO : change this method to overwrite for case () and identify student id to reduce time
+            interactions = self.dq.get_interactions(student_id)   # TODO : change this method to overwrite for case () and identify student id to reduce time
+            feeds_lookup = self.dq.get_user_events_json()         # TODO : change this method to overwrite for case () and identify student id to reduce time
             now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
             ### ----------- read HyDe-related configureation once ----------- ###
             history_threshold,recent_k,feed_text_max_chars,include_recent_feeds,query_embedding_model_name = self._read_hyde_config(self.cfg)
@@ -241,7 +396,6 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                 "history_summary_text": history_summary_text,
                 "hyde_output": hyde_json,
             }
-
             if self.verbose:
                 print(bundle)
             
@@ -262,49 +416,11 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                 "feed_text_max_chars" :self.cfg["hyde"]["feed_text_max_chars"], #
                 "temperature"         :self.cfg["llm"]["temperature"] #
             }
-            self.cgs.upload_json(
-                blob_path   = f"{student_id}/metadata/metadata.json",
-                json_data   = metadata
-            )
-            self.cgs.upload_npy(
-                blob_path   = f"{student_id}/embedding/embedding01.npy",
-                array       = emb[0]
-            )
-            self.cgs.upload_npy(
-                blob_path   = f"{student_id}/embedding/embedding02.npy",
-                array       = emb[1]
-            )
-            self.cgs.upload_npy(
-                blob_path   = f"{student_id}/embedding/embedding03.npy",
-                array       = emb[2]
-            )
-            self.cgs.upload_npy(
-                blob_path   = f"{student_id}/embedding/embedding04.npy",
-                array       = emb[3]
-            )
-            self.cgs.upload_npy(
-                blob_path   = f"{student_id}/embedding/embedding05.npy",
-                array       = emb[4]
-            )
-            self.cgs.upload_text(
-                blob_path = f"{student_id}/hyde/hyde_text01.txt",
-                text_data = hyde_query_texts[0]
-            )
-            self.cgs.upload_text(
-                blob_path = f"{student_id}/hyde/hyde_text02.txt",
-                text_data = hyde_query_texts[1]
-            )
-            self.cgs.upload_text(
-                blob_path = f"{student_id}/hyde/hyde_text03.txt",
-                text_data = hyde_query_texts[2]
-            )
-            self.cgs.upload_text(
-                blob_path = f"{student_id}/hyde/hyde_text04.txt",
-                text_data = hyde_query_texts[3]
-            )
-            self.cgs.upload_text(
-                blob_path = f"{student_id}/hyde/hyde_text05.txt",
-                text_data = hyde_query_texts[4]
+            self._upload_to_cgs(
+                student_id = student_id,
+                metadata   = metadata,
+                embedding  = emb,
+                hyde       = hyde_query_texts
             )
         except:
             status = "Fail"

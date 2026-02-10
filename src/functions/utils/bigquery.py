@@ -5,8 +5,8 @@ class DataQuery:
     def __init__(self):
         self.client = bigquery.Client()
     ### ---------- Download data ---------- ###
-    def get_students(self, student_ids: Optional[List[str]] = None):
-        if not student_ids:
+    def get_students(self, student_id:Optional[str]=None):
+        if student_id is None:
             query = """
             SELECT *
             FROM `poc-piloturl-nonprod.gold_layer.students`
@@ -16,27 +16,45 @@ class DataQuery:
             query = """
             SELECT *
             FROM `poc-piloturl-nonprod.gold_layer.students`
-            WHERE student_id IN UNNEST(@student_ids)
+            WHERE student_id = @student_id
             """
             job_config = bigquery.QueryJobConfig(
                 query_parameters=[
-                    bigquery.ArrayQueryParameter(
-                        "student_ids",
+                    bigquery.ScalarQueryParameter(
+                        "student_id",
                         "STRING",
-                        student_ids
+                        student_id
                     )
                 ]
             )
-
             job = self.client.query(query, job_config=job_config)
         return job.to_dataframe()
-    def get_interactions(self):
-        query = """
+    
+    def get_interactions(self,student_id:Optional[str]=None):
+        if student_id is None:
+            query = """
             SELECT *
             FROM `poc-piloturl-nonprod.gold_layer.interactions`
-        """
-        df = self.client.query(query).to_dataframe()
-        return df 
+            """
+            job = self.client.query(query)
+        else:
+            query = """
+            SELECT *
+            FROM `poc-piloturl-nonprod.gold_layer.interactions`
+            WHERE user_id = @student_id
+            """     
+            job_config = bigquery.QueryJobConfig(
+                query_parameters=[
+                    bigquery.ScalarQueryParameter(
+                        "student_id",
+                        "STRING",
+                        student_id
+                    )
+                ]
+            )
+            job = self.client.query(query, job_config=job_config)
+        return job.to_dataframe() 
+    
     def get_user_events_json(self):
         query = """
         SELECT *

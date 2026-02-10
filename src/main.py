@@ -12,13 +12,13 @@ from src.functions.core.hydegenerator import HydeGenerator
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",
-    version="1.1.0",
+    version="1.3.0",
     description=(
         "Hyde Feed and Cource recommentdation (In progress krub)"
         "<br>"
-        f"Last time Update : 2026-01-27 11:45:32"
+        f"Last time Update : 2026-02-10 16:52"
         "<br>"
-        "Repo : "
+        "Repo : https://github.com/TunKedsaro/Hyde"
     ),
     contact={
         "name": "Tun Kedsaro",
@@ -123,21 +123,23 @@ def bigquery_health_check():
 
 ### ----------   Hyde Generator  ---------- ###
 ### ----------     API:2.1       ---------- ###
+hg = HydeGenerator(
+    bucket_name = bucket_name,
+    verbose     = 0
+)
 @app.get(
     "/hyde/students/batch", 
     tags=["Hyde Generator"],
     description="API 2.1 : Generate recommendations for all students (batch)"
 )
 def generate_batch_recommendations():
+    student_id_updated, status = hg.batch_student_generator()
     return {
-        "response":"ok"
+        "student_id":student_id_updated,
+        "response"  :status
     }
 
 ### ----------     API:2.2       ---------- ###
-hg = HydeGenerator(
-    bucket_name = bucket_name,
-    verbose     = 0
-)
 @app.post(
     "/hyde/students/{student_id}", 
     tags=["Hyde Generator"],
