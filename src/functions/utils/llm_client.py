@@ -53,7 +53,7 @@ from tenacity import (
     wait_exponential,
 )
 
-from functions.utils.logging import get_logger
+from src.functions.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -467,8 +467,7 @@ class GeminiJsonClient:
 # Factories
 # =============================================================================
 def build_llm_client_from_yaml(
-    parameters_path: str = "parameters/parameters.yaml",
-    credentials_path: str = "parameters/credentials.yaml",
+    parameters_path: str = "parameters/parameters.yaml"
 ) -> GeminiJsonClient:
     """
     Factory for GeminiJsonClient using repo YAML configuration.
@@ -491,7 +490,7 @@ def build_llm_client_from_yaml(
       GeminiJsonClient
     """
     params = _load_yaml(parameters_path)
-    creds = _load_yaml(credentials_path)
+    # creds = _load_yaml(credentials_path)
 
     api_key = (
         os.environ.get("GOOGLE_API_KEY", "").strip()

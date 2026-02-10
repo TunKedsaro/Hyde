@@ -1,7 +1,14 @@
+import json
+import re
+import os
+
+from time import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from time import time
+from google import genai
+
 from src.functions.utils.cloudstorage import GoogleCloudStorage
+from src.functions.core.hydegenerator import HydeGenerator
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",
@@ -27,29 +34,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+### ----------      setting      ---------- ###
+bucket_name = "hyde-datalake"
 
-
-
-
-
-
+### ---------- Health & Metadata ---------- ###
+### ----------     API:0.0       ---------- ###
 @app.get(
     "/", 
     tags=["Health & Metadata"],
-    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+    description="API 0.0 : Service root status check"
 )
-
 def root_status():
     return {
         "response":"ok"
     }
 
-### Health & Metadata #######################################################
-### Health & Metadata.API:01 ################################################
+### ---------- Health & Metadata ---------- ###
+### ----------     API:1.1       ---------- ###
 @app.get(
     "/health/", 
     tags=["Health & Metadata"],
-    description="API:01 Basic health check endpoint for uptime monitoring."
+    description="API 1.1 : Basic service health check"
 )
 def health_check():
     start_time  = time()
@@ -61,20 +66,13 @@ def health_check():
         "response_time" : f"{process_time:.5f} s"
         }
 
-from google import genai
-import re
-import json
-import os
 
-
-### Health & Metadata.API:01 ################################################
-
+### ----------     API:1.2       ---------- ###
 @app.get(
     "/health/gemini", 
     tags=["Health & Metadata"],
-    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+    description="API 1.2 : Gemini connectivity and latency check"
 )
-
 def gemini_health_check():
     start_time  = time()
     client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -91,7 +89,7 @@ def gemini_health_check():
     }
 
 
-
+### ----------     API:1.3       ---------- ###
 from google.cloud import bigquery
 def get_user_events(user_id: str):
     client = bigquery.Client()
@@ -107,11 +105,11 @@ def get_user_events(user_id: str):
     )
     rows = client.query(query, job_config=job_config)
     return [dict(row) for row in rows]
-### Health & Metadata.API:02 ################################################
+
 @app.get(
     "/health/bigquery", 
     tags=["Health & Metadata"],
-    description="API:02 Bq -> project -> FastAPI"
+    description="API 1.3 : BigQuery connectivity test query"
 )
 def bigquery_health_check():
     start_time  = time()
@@ -123,106 +121,43 @@ def bigquery_health_check():
         "response_time" : f"{process_time:.5f} s"
         }
 
-
+### ----------   Hyde Generator  ---------- ###
+### ----------     API:2.1       ---------- ###
 @app.get(
     "/hyde/students/batch", 
     tags=["Hyde Generator"],
-    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+    description="API 2.1 : Generate recommendations for all students (batch)"
 )
-
 def generate_batch_recommendations():
     return {
         "response":"ok"
     }
 
+### ----------     API:2.2       ---------- ###
+hg = HydeGenerator(
+    bucket_name = bucket_name,
+    verbose     = 0
+)
 @app.post(
     "/hyde/students/{student_id}", 
     tags=["Hyde Generator"],
-    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+    description="API 2.2 : Generate HyDE bundle for a single student"
 )
-
-def generate_student_recommendation():
+def generate_student_recommendation(student_id):
+    status = hg.single_student_generator(student_id=student_id)
     return {
-        "response":"ok"
+        "student_id":student_id,
+        "response"  :status
     }
 
-# cgs = GoogleCloudStorage(bucket_name = "hyde-datalake-feeds")
 
-# @app.post(
-#     "/hyde/students/{student_id}/feed", 
-#     tags=["Fetch results"],
-#     description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
-# )
-
-# def get_student_feed(student_id):
-#     metadata = cgs.read_json(f"{student_id}/metadata/metadata.json")
-#     emb1     = cgs.read_npy(f"{student_id}/embedding/embedding01.npy")
-#     emb2     = cgs.read_npy(f"{student_id}/embedding/embedding02.npy")
-#     emb3     = cgs.read_npy(f"{student_id}/embedding/embedding03.npy")
-#     emb4     = cgs.read_npy(f"{student_id}/embedding/embedding04.npy")
-#     emb5     = cgs.read_npy(f"{student_id}/embedding/embedding05.npy")
-#     return {
-#         "student_id":student_id,
-#         "metadata":metadata,
-#         "embedded_vector":{
-#             "emb1":emb1.tolist(),
-#             "emb2":emb2.tolist(),
-#             "emb3":emb3.tolist(),
-#             "emb4":emb4.tolist(),
-#             "emb5":emb5.tolist()
-#         }
-#     }
-
-
-# {
-#     "student_id": "stu_p003",
-#     "metadata": {
-#         "student_id": "stu_p003",
-#         "current_status": "student4+yr",
-#         "education_level": "bachelor",
-#         "education_major": "สถิติ",
-#         "target_roles": "Data Analyst",
-#         "timezone": "UTC",
-#         "model_name": "gemini-2.5-flash",
-#         "max_output_tokens": 2048,
-#         "feed_text_max_chars": 240,
-#         "temperature": 0.2
-#     },
-#     "embedded_vector": {
-#         "emb1": [
-#             0.0003576562739908695,
-#             ...
-#             -0.02179572731256485,
-#     ],    
-#         "emb2": [
-#             0.0003576562739908695,
-#             ...
-#             -0.02179572731256485,
-#     ],   
-#         "emb3": [
-#             0.0003576562739908695,
-#             ...
-#             -0.02179572731256485,
-#     ],   
-#         "emb4": [
-#             0.0003576562739908695,
-#             ...
-#             -0.02179572731256485,
-#     ],   
-#         "emb5": [
-#             0.0003576562739908695,
-#             ...
-#             -0.02179572731256485,
-#     ]
-#     }
-# } 
-
-gcs = GoogleCloudStorage(bucket_name="hyde-datalake-feeds")
-
+### ----------   Fetch results   ---------- ###
+### ----------     API:3.1       ---------- ###
+gcs = GoogleCloudStorage(bucket_name=bucket_name)
 @app.post(
     "/hyde/students/{student_id}/feed", 
     tags=["Fetch results"],
-    description="API:02 Connectivity health check for Gemini LLM service. Verifies API availability and measures round-trip response latency."
+    description="API 3.1 : Fetch generated HyDE feed results and embeddings"
 )
 
 def get_student_feed(student_id):

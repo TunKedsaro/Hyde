@@ -11,8 +11,8 @@ import io
 from datetime import datetime, timedelta, timezone
 from google.cloud import storage
 
-# from src.functions.utils.bigquery import DataQuery   # Deploy
-from functions.utils.bigquery import DataQuery         # jupyter
+from src.functions.utils.bigquery import DataQuery   # Deploy
+# from functions.utils.bigquery import DataQuery         # jupyter
 
 class GoogleCloudStorage:
     '''
@@ -95,7 +95,7 @@ class GoogleCloudStorage:
             buffer,
             content_type = "application/octet-stream"
         )
-        print(f"Uploaded NPY -> gs://{self.bucket.name}/{blob_path}")
+        print(f"Uploaded NPY  -> gs://{self.bucket.name}/{blob_path}")
         
     ### ---------- Read file from GCS ---------- ###
     def read_json(self,blob_path:str) -> dict:
