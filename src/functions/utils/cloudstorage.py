@@ -223,14 +223,14 @@ class GoogleCloudStorage:
                     results["status"] += f"    |- {path} /\n"
                     results["embeddings"][name] = self.read_npy(path)
                 else:
-                    results["embeddings"][name] = np.array([])
+                    results["embeddings"][name] = np.zeros((0,768),dtype=np.float32)
                     results["status"] += f"    |- {path} x\n"
         else:
             results["status"] += "  |- embedding folder x\n"
             for name in self.embedding_names:
                 path = f"{embedding_prefix}/{name}"
                 results["status"] += f"    |- {path} x\n"
-                results["embeddings"][name] = np.array([])
+                results["embeddings"][name] = np.zeros((0,768),dtype=np.float32)
                 
         return results
         

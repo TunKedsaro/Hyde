@@ -204,32 +204,46 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             text_data = hyde[4]
         )
     
-    ### ---------- main pipeline ---------- ###
+    #----------------------------------------------------------------------
+    # main pipeline
+    #----------------------------------------------------------------------
     def batch_student_generator(self):
         status = "Complete"
         student_id_updated:list = []
         try:
-            ### ----------- initail value ----------- ###
+            #----------------------------------------------------------------------
+            # initail value
+            #----------------------------------------------------------------------
             students     = self.dq.get_students()             # TODO : change this method to overwrite for case () and identify student id to reduce time
             interactions = self.dq.get_interactions()         # TODO : change this method to overwrite for case () and identify student id to reduce time
             feeds_lookup = self.dq.get_user_events_json()     # TODO : change this method to overwrite for case () and identify student id to reduce time
             now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-            ### ----------- read HyDe-related configureation once ----------- ###
+            #----------------------------------------------------------------------
+            # read HyDe-related configureation once
+            #----------------------------------------------------------------------
             history_threshold,recent_k,feed_text_max_chars,include_recent_feeds,query_embedding_model_name = self._read_hyde_config(self.cfg)
             expected_dim = int(self.cfg.get("embeddings", {}).get("dim", 0) or 0)
-            ### ----------- Hyde prompt ----------- ###
+            #----------------------------------------------------------------------
+            # Hyde prompt
+            #----------------------------------------------------------------------
             prompts = self._load_prompts()
             if not prompts:
                 raise ValueError("hyde_prompts missing from parameters/prompts.yaml")
             client = build_llm_client_from_yaml(
                 parameters_path=str(PROJECT_ROOT / "parameters" / "parameters.yaml")
                 )
-            ### ----------- Generate one cached bundle per student ---------- ###
+            #----------------------------------------------------------------------
+            # Generate one cached bundle per student
+            #----------------------------------------------------------------------
             for _, row in students.iterrows():
-                ### ---------- 01 locate student row ---------- ###
+                #----------------------------------------------------------------------
+                # 01 locate student row
+                #----------------------------------------------------------------------
                 student_row = row.to_dict()     # convert pd -> dict for each row
                 student_id  = str(student_row.get("student_id","")).strip()
-                ### ---------- 02 build context ---------- ###
+                #----------------------------------------------------------------------
+                # 02 build context
+                #----------------------------------------------------------------------
                 user_ctx = build_user_context(student_row)
                 pref_lang = user_ctx.user_context_json.get("preferred_language","th")
                 user_events = interactions[interactions["user_id"] == student_id]   # <- user event from interaction.csv
@@ -243,7 +257,9 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                         feeds_lookup         = feeds_lookup or None,
                         feed_text_max_chars  = feed_text_max_chars,
                     )
-                ### ---------- 03 build prompt ---------- ###
+                #----------------------------------------------------------------------
+                # 03 build prompt
+                #----------------------------------------------------------------------
                 prompt_key = self._choose_hyde_prompt_key(num_events,history_threshold)
                 template = prompts.get(prompt_key)
                 if not template:
@@ -254,9 +270,13 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                         user_context_text=user_ctx.user_context_text,
                         history_summary_text=history_summary_text,
                     )
-                ### ---------- 04 LLM call ---------- ###
+                #----------------------------------------------------------------------
+                # 04 LLM call
+                #----------------------------------------------------------------------
                 hyde_json = client.generate_json(prompt)
-                ### ---------- 05 Shin embedding ---------- ###
+                #----------------------------------------------------------------------
+                # 05 Shin embedding
+                #----------------------------------------------------------------------
                 hyde_query_texts = self._extract_hyde_query_texts(hyde_json)
 
                 if hyde_query_texts:
@@ -271,7 +291,9 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                 else:
                     dim = expected_dim or 0
                     emb = np.zeros((0, dim), dtype=np.float32)
-                ### ---------- 06 save bundle locally ---------- ###
+                #----------------------------------------------------------------------
+                # 06 save bundle locally
+                #----------------------------------------------------------------------
                 bundle = {
                     "bundle_version": "v2_hyde_embedded_queries",
                     "student_id": student_id,
@@ -287,7 +309,9 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                 if self.verbose:
                     print(bundle)
 
-                ### ---------- 07 upload to GCS ---------- ###
+                #----------------------------------------------------------------------
+                # 07 upload to GCS
+                #----------------------------------------------------------------------
                 self.cgs.create_folder(f"{student_id}/metadata/")
                 self.cgs.create_folder(f"{student_id}/hyde/")
                 self.cgs.create_folder(f"{student_id}/embedding/")
