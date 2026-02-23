@@ -146,7 +146,6 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
         """
         if not isinstance(hyde_json, dict):
             raise ValueError("hyde_output must be a dict")
-
         items = hyde_json.get("hyde_queries") or []
         if not isinstance(items, list):
             raise ValueError("hyde_output.hyde_queries must be a list")
@@ -158,7 +157,7 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             out.append(str(it.get("query_text") or "").strip())
         return out
     
-    def _upload_to_cgs(self,student_id,metadata,embedding,hyde):
+    def _upload_to_cgs(self,student_id,metadata,embedding,hyde,hyde_json):
         self.cgs.upload_json(
             blob_path   = f"{student_id}/metadata/metadata.json",
             json_data   = metadata
@@ -182,6 +181,26 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
         self.cgs.upload_npy(
             blob_path   = f"{student_id}/embedding/embedding05.npy",
             array       = embedding[4]
+        )
+        self.cgs.upload_json(
+            blob_path = f"{student_id}/hyde/hyde_text01.json",
+            json_data = hyde_json['hyde_queries'][0]
+        )
+        self.cgs.upload_json(
+            blob_path = f"{student_id}/hyde/hyde_text02.json",
+            json_data = hyde_json['hyde_queries'][1]
+        )
+        self.cgs.upload_json(
+            blob_path = f"{student_id}/hyde/hyde_text03.json",
+            json_data = hyde_json['hyde_queries'][2]
+        )
+        self.cgs.upload_json(
+            blob_path = f"{student_id}/hyde/hyde_text04.json",
+            json_data = hyde_json['hyde_queries'][3]
+        )
+        self.cgs.upload_json(
+            blob_path = f"{student_id}/hyde/hyde_text05.json",
+            json_data = hyde_json['hyde_queries'][4]
         )
         self.cgs.upload_text(
             blob_path = f"{student_id}/hyde/hyde_text01.txt",
@@ -328,12 +347,12 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                     "feed_text_max_chars" :self.cfg["hyde"]["feed_text_max_chars"], #
                     "temperature"         :self.cfg["llm"]["temperature"] #
                 }
-                
                 self._upload_to_cgs(
                     student_id = student_id,
                     metadata   = metadata,
                     embedding  = emb,
-                    hyde       = hyde_query_texts
+                    hyde       = hyde_query_texts,
+                    hyde_json  = hyde_json
                 )
         except:
             status = "Fail"
@@ -444,7 +463,8 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                 student_id = student_id,
                 metadata   = metadata,
                 embedding  = emb,
-                hyde       = hyde_query_texts
+                hyde       = hyde_query_texts,
+                hyde_json  = hyde_json
             )
         except:
             status = "Fail"

@@ -32,6 +32,7 @@ class GoogleCloudStorage:
             self.bucket = None
             print(f"Bucket NOT exists : {bucket_name}")
         self.hyde_names      = ["hyde_text01.txt","hyde_text02.txt","hyde_text03.txt","hyde_text04.txt","hyde_text05.txt"]
+        self.hyde_json       = ["hyde_text01.json","hyde_text02.json","hyde_text03.json","hyde_text04.json","hyde_text05.json"]
         self.embedding_names = ["embedding01.npy","embedding02.npy","embedding03.npy","embedding04.npy","embedding05.npy"]
 
     def blob_exists(self, blob_path:str) -> bool:
@@ -233,7 +234,43 @@ class GoogleCloudStorage:
                 results["embeddings"][name] = np.zeros((0,768),dtype=np.float32)
                 
         return results
-        
+
+    def retrieve_student_hyde_json(self, student_id:str) -> dict:
+        results = {
+            "hyde"      :{},
+            "status"    :""
+        }
+        ### ----------- bucket ---------- ###
+        if self.bucket_exists:
+            results["status"] += f"{self.bucket_name} /\n"
+        else:
+            results["status"] += f"{self.bucket_name} x\n"
+        ### --------- student --------- ###
+        student_prefix = f"{student_id}"
+        if self._prefix_exists(student_prefix):
+            results["status"] += f"|- {student_id} /\n"
+        else:
+            results["status"] += f"|- {student_id} x\n"
+        ### ----------preparepart---------- ###
+        hyde_prefix      = f"{student_id}/hyde"
+        ### ----------hyde---------- ###
+        if self._prefix_exists(hyde_prefix):
+            results["status"] += "  |- hyde folder /\n"
+            for name in self.hyde_json:
+                path = f"{hyde_prefix}/{name}"
+                if self.blob_exists(path):
+                    results["status"] += f"    |- {path} /\n"
+                    results["hyde"][name] = self.read_json(path)
+                else:
+                    results["hyde"][name] = ""
+                    results["status"] += f"    |- {path} x\n"
+        else:
+            results["status"] += "  |- hyde folder x\n"
+            for name in self.hyde_names:
+                path = f"{hyde_prefix}/{name}"
+                results["status"] += f"    |- {path} x\n"
+                results["hyde"][name] = ""
+        return results
 #     # def delete_by_ttl(self, prefix, ttl: timedelta):
 #     #     '''Remove folder with setting time
 #     #     timeformat support
@@ -256,4 +293,6 @@ class GoogleCloudStorage:
 #     #             deleted += 1
 #     #     print(f"TTL cleanup deleted {deleted} objects under {prefix}")
         
-# # cgs = GoogleCloudStorage(bucket_name = "hyde-datalake")
+# print("xxx")
+# cgs = GoogleCloudStorage(bucket_name = "hyde-datalake")
+# x  = cgs.retrieve_student_hyde_json("stu_p000")

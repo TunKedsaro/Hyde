@@ -12,11 +12,11 @@ from src.functions.core.hydegenerator import HydeGenerator
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",
-    version="1.3.0",
+    version="1.4.0",
     description=(
         "Hyde Feed and Cource recommentdation (In progress krub)"
         "<br>"
-        f"Last time Update : 2026-02-10 16:52"
+        f"Last time Update : 2026-02-24 00:29"
         "<br>"
         "Repo : https://github.com/TunKedsaro/Hyde"
     ),
@@ -182,6 +182,29 @@ def get_student_feed(student_id):
             "embedding_vector4":results["embeddings"]['embedding04.npy'].tolist(),
             "embedding_vector5":results["embeddings"]['embedding05.npy'].tolist()
         }
+    }
+
+### ----------     API:3.2       ---------- ###
+gcs = GoogleCloudStorage(bucket_name=bucket_name)
+@app.post(
+    "/hyde/students/{student_id}/json", 
+    tags=["Fetch results"],
+    description="API 3.2 : Fetch generated HyDE feed results and embeddings"
+)
+
+def get_student_feed(student_id):
+    results = gcs.retrieve_student_hyde_json(student_id)
+    return {
+        "student_id":student_id,
+        "status":results["status"],
+        "nq":len(results["hyde"]),
+        "hq":{
+            "hyde_json1":results["hyde"]["hyde_text01.json"],
+            "hyde_json2":results["hyde"]["hyde_text02.json"],
+            "hyde_json3":results["hyde"]["hyde_text03.json"],
+            "hyde_json4":results["hyde"]["hyde_text04.json"],
+            "hyde_json5":results["hyde"]["hyde_text05.json"],
+        },
     }
 
 # {
