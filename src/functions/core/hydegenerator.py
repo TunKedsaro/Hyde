@@ -26,7 +26,6 @@ from src.functions.utils.cloudstorage import GoogleCloudStorage
 from src.functions.utils.bigquery import DataQuery
 from src.functions.utils.shin_embedder import embed_texts_gemini
 
-
 ### ---------- initail value ---------- ###
 class HydeGenerator(GoogleCloudStorage,DataQuery):
     def __init__(self,bucket_name:str,verbose:int=0):
@@ -157,7 +156,7 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             out.append(str(it.get("query_text") or "").strip())
         return out
     
-    def _upload_to_cgs(self,student_id,metadata,embedding,hyde,hyde_json):
+    def _upload_to_cgs(self,student_id,metadata,embedding,hyde_json):
         self.cgs.upload_json(
             blob_path   = f"{student_id}/metadata/metadata.json",
             json_data   = metadata
@@ -183,49 +182,67 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             array       = embedding[4]
         )
         self.cgs.upload_json(
-            blob_path = f"{student_id}/hyde/hyde_text01.json",
-            json_data = hyde_json['hyde_queries'][0]
+            blob_path = f"{student_id}/hyde/hyde.json",
+            json_data = hyde_json
         )
-        self.cgs.upload_json(
-            blob_path = f"{student_id}/hyde/hyde_text02.json",
-            json_data = hyde_json['hyde_queries'][1]
-        )
-        self.cgs.upload_json(
-            blob_path = f"{student_id}/hyde/hyde_text03.json",
-            json_data = hyde_json['hyde_queries'][2]
-        )
-        self.cgs.upload_json(
-            blob_path = f"{student_id}/hyde/hyde_text04.json",
-            json_data = hyde_json['hyde_queries'][3]
-        )
-        self.cgs.upload_json(
-            blob_path = f"{student_id}/hyde/hyde_text05.json",
-            json_data = hyde_json['hyde_queries'][4]
-        )
-        self.cgs.upload_text(
-            blob_path = f"{student_id}/hyde/hyde_text01.txt",
-            text_data = hyde[0]
-        )
-        self.cgs.upload_text(
-            blob_path = f"{student_id}/hyde/hyde_text02.txt",
-            text_data = hyde[1]
-        )
-        self.cgs.upload_text(
-            blob_path = f"{student_id}/hyde/hyde_text03.txt",
-            text_data = hyde[2]
-        )
-        self.cgs.upload_text(
-            blob_path = f"{student_id}/hyde/hyde_text04.txt",
-            text_data = hyde[3]
-        )
-        self.cgs.upload_text(
-            blob_path = f"{student_id}/hyde/hyde_text05.txt",
-            text_data = hyde[4]
-        )
+        # self.cgs.upload_json(
+        #     blob_path = f"{student_id}/hyde/hyde_text02.json",
+        #     json_data = hyde_json['hyde_queries'][1]
+        # )
+        # self.cgs.upload_json(
+        #     blob_path = f"{student_id}/hyde/hyde_text03.json",
+        #     json_data = hyde_json['hyde_queries'][2]
+        # )
+        # self.cgs.upload_json(
+        #     blob_path = f"{student_id}/hyde/hyde_text04.json",
+        #     json_data = hyde_json['hyde_queries'][3]
+        # )
+        # self.cgs.upload_json(
+        #     blob_path = f"{student_id}/hyde/hyde_text05.json",
+        #     json_data = hyde_json['hyde_queries'][4]
+        # )
+        # self.cgs.upload_text(
+        #     blob_path = f"{student_id}/hyde/hyde_text01.txt",
+        #     text_data = hyde[0]
+        # )
+        # self.cgs.upload_text(
+        #     blob_path = f"{student_id}/hyde/hyde_text02.txt",
+        #     text_data = hyde[1]
+        # )
+        # self.cgs.upload_text(
+        #     blob_path = f"{student_id}/hyde/hyde_text03.txt",
+        #     text_data = hyde[2]
+        # )
+        # self.cgs.upload_text(
+        #     blob_path = f"{student_id}/hyde/hyde_text04.txt",
+        #     text_data = hyde[3]
+        # )
+        # self.cgs.upload_text(
+        #     blob_path = f"{student_id}/hyde/hyde_text05.txt",
+        #     text_data = hyde[4]
+        # )
     
     #----------------------------------------------------------------------
     # main pipeline
     #----------------------------------------------------------------------
+    def student_feed_id(self, user_id: str):
+        client = bigquery.Client()
+        query = """
+            SELECT *
+            FROM `poc-piloturl-nonprod.gold_layer.interactions`
+            WHERE user_id = @user_id
+        """
+        job_config = bigquery.QueryJobConfig(
+            query_parameters=[
+                bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
+            ]
+        )
+        rows = client.query(query, job_config=job_config).result()
+        return [
+            {k: str(v) for k, v in dict(row).items()}
+            for row in rows
+        ]
+    
     def batch_student_generator(self):
         status = "Complete"
         student_id_updated:list = []
@@ -345,20 +362,24 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                     "model_name"          :self.cfg["llm"]["model_name"], #
                     "max_output_tokens"   :self.cfg["llm"]["max_output_tokens"], #
                     "feed_text_max_chars" :self.cfg["hyde"]["feed_text_max_chars"], #
-                    "temperature"         :self.cfg["llm"]["temperature"] #
+                    "temperature"         :self.cfg["llm"]["temperature"], #
+                    "interaction"         :self.student_feed_id(student_id)
+
                 }
                 self._upload_to_cgs(
                     student_id = student_id,
                     metadata   = metadata,
                     embedding  = emb,
-                    hyde       = hyde_query_texts,
-                    hyde_json  = hyde_json
+                    # hyde       = hyde_query_texts,
+                    hyde_json  = {"hq":hyde_json['hyde_queries']}
                 )
         except:
             status = "Fail"
 
         return student_id_updated,status
-    
+        
+
+
     def single_student_generator(self,student_id:str):
         status = "Complete"
         try:
@@ -409,7 +430,8 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             )
             ### ---------- 04 LLM call ---------- ###
             hyde_json = client.generate_json(prompt)
-            
+            print(f"hyde_json -> {hyde_json}")
+
             ### ---------- 05 Shin embedding ---------- ###
             hyde_query_texts = self._extract_hyde_query_texts(hyde_json)
 
@@ -457,16 +479,19 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                 "model_name"          :self.cfg["llm"]["model_name"], #
                 "max_output_tokens"   :self.cfg["llm"]["max_output_tokens"], #
                 "feed_text_max_chars" :self.cfg["hyde"]["feed_text_max_chars"], #
-                "temperature"         :self.cfg["llm"]["temperature"] #
+                "temperature"         :self.cfg["llm"]["temperature"], #
+                "interaction"         :self.student_feed_id(student_id)
             }
             self._upload_to_cgs(
                 student_id = student_id,
                 metadata   = metadata,
                 embedding  = emb,
-                hyde       = hyde_query_texts,
-                hyde_json  = hyde_json
+                # hyde       = hyde_query_texts,
+                hyde_json  = {"hq":hyde_json['hyde_queries']}
             )
-        except:
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
             status = "Fail"
         return status
         

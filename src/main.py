@@ -35,7 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 ### ----------      setting      ---------- ###
-bucket_name = "hyde-datalake"
+bucket_name = "hyde-datalake-feeds"
 
 ### ---------- Health & Metadata ---------- ###
 ### ----------     API:0.0       ---------- ###

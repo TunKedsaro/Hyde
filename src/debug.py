@@ -30,3 +30,44 @@
 
 # data = fetch_hyde("stu_p001")
 # print(data[1])
+
+
+from google.cloud import bigquery
+import json
+
+# def get_user_events(user_id: str):
+#     client = bigquery.Client()
+#     query = """
+#         SELECT *
+#         FROM `poc-piloturl-nonprod.gold_layer.students`
+#         WHERE student_id = @user_id
+#     """
+#     job_config = bigquery.QueryJobConfig(
+#         query_parameters=[
+#             bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
+#         ]
+#     )
+#     rows = client.query(query, job_config=job_config)
+#     return [dict(row) for row in rows]
+
+# # x = get_user_events('stu_p000')
+# # print(x)
+import json
+
+def student_feed_id(user_id: str):
+    client = bigquery.Client()
+    query = """
+        SELECT *
+        FROM `poc-piloturl-nonprod.gold_layer.interactions`
+        WHERE user_id = @user_id
+    """
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[
+            bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
+        ]
+    )
+    rows = client.query(query, job_config=job_config).result()
+    return [dict(row) for row in rows]
+
+x = student_feed_id('stu_p000')
+print(type(x))
