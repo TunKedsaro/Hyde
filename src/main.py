@@ -164,6 +164,7 @@ gcs = GoogleCloudStorage(bucket_name=bucket_name)
 
 def get_student_feed(student_id):
     results = gcs.retrieve_student_bundle(student_id)
+    print(f"results -> {results}")
     return {
         "student_id":student_id,
         "status":results["status"],
@@ -184,28 +185,6 @@ def get_student_feed(student_id):
         }
     }
 
-### ----------     API:3.2       ---------- ###
-gcs = GoogleCloudStorage(bucket_name=bucket_name)
-@app.post(
-    "/hyde/students/{student_id}/json", 
-    tags=["Fetch results"],
-    description="API 3.2 : Fetch generated HyDE feed results and embeddings"
-)
-
-def get_student_feed(student_id):
-    results = gcs.retrieve_student_hyde_json(student_id)
-    return {
-        "student_id":student_id,
-        "status":results["status"],
-        "nq":len(results["hyde"]),
-        "hq":{
-            "hyde_json1":results["hyde"]["hyde_text01.json"],
-            "hyde_json2":results["hyde"]["hyde_text02.json"],
-            "hyde_json3":results["hyde"]["hyde_text03.json"],
-            "hyde_json4":results["hyde"]["hyde_text04.json"],
-            "hyde_json5":results["hyde"]["hyde_text05.json"],
-        },
-    }
 
 # {
 #   "student_id": "stu_p001",
