@@ -57,7 +57,8 @@ artifacts:
 # LLM configuration (PARTIALLY USED in POC)
 # --------------------------------------------------------------------------------------
 llm:
-  model_name: gemini-2.5-flash
+  # model_name: gemini-2.5-flash
+  model_name: gemini-3-flash-preview
   max_output_tokens: 2048
   temperature: 0.2
   # USED:

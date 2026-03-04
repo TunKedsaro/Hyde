@@ -3,6 +3,8 @@ import re
 import os
 
 from time import time
+from pathlib import Path
+import yaml
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from google import genai
@@ -35,7 +37,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 ### ----------      setting      ---------- ###
-bucket_name = "hyde-datalake"
+config_path = Path(__file__).resolve().parent / "parameters" / "prompts.yaml"
+with open(config_path, "r", encoding="utf-8") as f:
+    config = yaml.safe_load(f)
+bucket_name = config["bigquery"]["bucket"]
 
 ### ---------- Health & Metadata ---------- ###
 ### ----------     API:0.0       ---------- ###
@@ -122,23 +127,10 @@ def bigquery_health_check():
         }
 
 ### ----------   Hyde Generator  ---------- ###
-### ----------     API:2.1       ---------- ###
 hg = HydeGenerator(
     bucket_name = bucket_name,
     verbose     = 0
 )
-@app.get(
-    "/hyde/students/batch", 
-    tags=["Hyde Generator"],
-    description="API 2.1 : Generate recommendations for all students (batch)"
-)
-def generate_batch_recommendations():
-    student_id_updated, status = hg.batch_student_generator()
-    return {
-        "student_id":student_id_updated,
-        "response"  :status
-    }
-
 ### ----------     API:2.2       ---------- ###
 @app.post(
     "/hyde/students/{student_id}", 
@@ -149,6 +141,20 @@ def generate_student_recommendation(student_id):
     status = hg.single_student_generator(student_id=student_id)
     return {
         "student_id":student_id,
+        "response"  :status
+    }
+
+
+### ----------     API:2.1       ---------- ###
+@app.get(
+    "/hyde/students/batch", 
+    tags=["Hyde Generator"],
+    description="API 2.1 : Generate recommendations for all students (batch)"
+)
+def generate_batch_recommendations():
+    student_id_updated, status = hg.batch_student_generator()
+    return {
+        "student_id":student_id_updated,
         "response"  :status
     }
 
@@ -180,37 +186,37 @@ def generate_hyde_for_all_students(max_workers: int = 5):
         "max_workers": max_workers
     }
 
-### ----------   Fetch results   ---------- ###
-### ----------     API:3.1       ---------- ###
-gcs = GoogleCloudStorage(bucket_name=bucket_name)
-@app.post(
-    "/hyde/students/{student_id}/feed", 
-    tags=["Fetch results"],
-    description="API 3.1 : Fetch generated HyDE feed results and embeddings"
-)
+# ### ----------   Fetch results   ---------- ###
+# ### ----------     API:3.1       ---------- ###
+# gcs = GoogleCloudStorage(bucket_name=bucket_name)
+# @app.post(
+#     "/hyde/students/{student_id}/feed", 
+#     tags=["Fetch results"],
+#     description="API 3.1 : Fetch generated HyDE feed results and embeddings"
+# )
 
-def get_student_feed(student_id):
-    results = gcs.retrieve_student_bundle(student_id)
-    print(f"results -> {results}")
-    return {
-        "student_id":student_id,
-        "status":results["status"],
-        "metadata":results["metadata"],
-        "hyde":{
-            "hyde_context1":results["hyde"]["hyde_text01.txt"],
-            "hyde_context2":results["hyde"]["hyde_text02.txt"],
-            "hyde_context3":results["hyde"]["hyde_text03.txt"],
-            "hyde_context4":results["hyde"]["hyde_text04.txt"],
-            "hyde_context5":results["hyde"]["hyde_text05.txt"],
-        },
-        "embedded_vector":{
-            "embedding_vector1":results["embeddings"]['embedding01.npy'].tolist(),
-            "embedding_vector2":results["embeddings"]['embedding02.npy'].tolist(),
-            "embedding_vector3":results["embeddings"]['embedding03.npy'].tolist(),
-            "embedding_vector4":results["embeddings"]['embedding04.npy'].tolist(),
-            "embedding_vector5":results["embeddings"]['embedding05.npy'].tolist()
-        }
-    }
+# def get_student_feed(student_id):
+#     results = gcs.retrieve_student_bundle(student_id)
+#     print(f"results -> {results}")
+#     return {
+#         "student_id":student_id,
+#         "status":results["status"],
+#         "metadata":results["metadata"],
+#         "hyde":{
+#             "hyde_context1":results["hyde"]["hyde_text01.txt"],
+#             "hyde_context2":results["hyde"]["hyde_text02.txt"],
+#             "hyde_context3":results["hyde"]["hyde_text03.txt"],
+#             "hyde_context4":results["hyde"]["hyde_text04.txt"],
+#             "hyde_context5":results["hyde"]["hyde_text05.txt"],
+#         },
+#         "embedded_vector":{
+#             "embedding_vector1":results["embeddings"]['embedding01.npy'].tolist(),
+#             "embedding_vector2":results["embeddings"]['embedding02.npy'].tolist(),
+#             "embedding_vector3":results["embeddings"]['embedding03.npy'].tolist(),
+#             "embedding_vector4":results["embeddings"]['embedding04.npy'].tolist(),
+#             "embedding_vector5":results["embeddings"]['embedding05.npy'].tolist()
+#         }
+#     }
 
 
 # {

@@ -382,7 +382,7 @@ class GeminiJsonClient:
             t0 = time.perf_counter()
 
             # print(f"prompt -> {prompt}")
-
+            print(f"model -> {self.model_name}")
             resp = self._client.models.generate_content(
                 model=self.model_name,
                 contents=prompt,
