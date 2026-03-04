@@ -381,6 +381,8 @@ class GeminiJsonClient:
             # Use perf_counter for monotonic, stable latency measurement.
             t0 = time.perf_counter()
 
+            # print(f"prompt -> {prompt}")
+
             resp = self._client.models.generate_content(
                 model=self.model_name,
                 contents=prompt,
@@ -391,6 +393,8 @@ class GeminiJsonClient:
                     response_mime_type="application/json",
                 ),
             )
+
+            # print(f"resp -> {resp}")
 
             latency_s = time.perf_counter() - t0
             in_tok, out_tok = _extract_token_usage(resp)

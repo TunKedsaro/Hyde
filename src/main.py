@@ -35,7 +35,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 ### ----------      setting      ---------- ###
-bucket_name = "hyde-datalake-feeds"
+bucket_name = "hyde-datalake"
 
 ### ---------- Health & Metadata ---------- ###
 ### ----------     API:0.0       ---------- ###
@@ -152,6 +152,33 @@ def generate_student_recommendation(student_id):
         "response"  :status
     }
 
+
+
+
+
+### ---------- API:2.3 ---------- ###
+import threading
+@app.post(
+    "/hyde/batch",
+    tags=["Deving"]
+)
+def generate_hyde_for_all_students(max_workers: int = 5):
+    """
+    Trigger batch job to generate HyDE for ALL students in BigQuery.
+    - student_ids is always None (meaning: fetch from BQ)
+    - runs in background thread so API returns immediately
+    """
+
+    def _run():
+        hg.batch_student_async(student_ids=None, max_workers=max_workers)
+
+    thread = threading.Thread(target=_run, daemon=True)
+    thread.start()
+
+    return {
+        "status": "Batch started",
+        "max_workers": max_workers
+    }
 
 ### ----------   Fetch results   ---------- ###
 ### ----------     API:3.1       ---------- ###

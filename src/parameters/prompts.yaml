@@ -1,3 +1,18 @@
+# config.yaml
+bigquery:
+  project: poc-piloturl-nonprod
+  dataset: gold_layer
+
+  tables:
+    students: students_1k
+    interactions: interactions_180k
+    feeds: feeds_20k
+
+  # tables:
+  #   students: students
+  #   interactions: interactions
+  #   feeds: feeds
+
 hyde_prompts:
   # Prompt-A: sparse/medium history
   hyde_a: |

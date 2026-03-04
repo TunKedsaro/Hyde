@@ -1,21 +1,56 @@
 from google.cloud import bigquery
 from typing import Any, Dict, List, Optional, Tuple
+import yaml
+from pathlib import Path
 
 class DataQuery:
-    def __init__(self):
+    def __init__(self, config_path: Path | None = None):
         self.client = bigquery.Client()
-    ### ---------- Download data ---------- ###
-    def get_students(self, student_id:Optional[str]=None):
+        config_path = config_path or (Path(__file__).resolve().parents[2] / "parameters" / "prompts.yaml")
+        with open(config_path, "r", encoding="utf-8") as f:
+            self.config = yaml.safe_load(f)
+        self.project = self.config["bigquery"]["project"]
+        self.dataset = self.config["bigquery"]["dataset"]
+        self.tables  = self.config["bigquery"]["tables"]
+
+    # def get_students(self, student_id:Optional[str]=None):
+    #     if student_id is None:
+    #         query = """
+    #         SELECT *
+    #         FROM `poc-piloturl-nonprod.gold_layer.students`
+    #         """
+    #         job = self.client.query(query)
+    #     else:
+    #         query = """
+    #         SELECT *
+    #         FROM `poc-piloturl-nonprod.gold_layer.students`
+    #         WHERE student_id = @student_id
+    #         """
+    #         job_config = bigquery.QueryJobConfig(
+    #             query_parameters=[
+    #                 bigquery.ScalarQueryParameter(
+    #                     "student_id",
+    #                     "STRING",
+    #                     student_id
+    #                 )
+    #             ]
+    #         )
+    #         job = self.client.query(query, job_config=job_config)
+    #     return job.to_dataframe()
+    def get_students(self, student_id: Optional[str] = None):
+
+        table_id = f"{self.project}.{self.dataset}.{self.tables['students']}"
+
         if student_id is None:
-            query = """
+            query = f"""
             SELECT *
-            FROM `poc-piloturl-nonprod.gold_layer.students`
+            FROM `{table_id}`
             """
             job = self.client.query(query)
         else:
-            query = """
+            query = f"""
             SELECT *
-            FROM `poc-piloturl-nonprod.gold_layer.students`
+            FROM `{table_id}`
             WHERE student_id = @student_id
             """
             job_config = bigquery.QueryJobConfig(
@@ -28,21 +63,50 @@ class DataQuery:
                 ]
             )
             job = self.client.query(query, job_config=job_config)
+
         return job.to_dataframe()
     
-    def get_interactions(self,student_id:Optional[str]=None):
+    # def get_interactions(self,student_id:Optional[str]=None):
+    #     if student_id is None:
+    #         query = """
+    #         SELECT *
+    #         FROM `poc-piloturl-nonprod.gold_layer.interactions`
+    #         """
+    #         job = self.client.query(query)
+    #     else:
+    #         query = """
+    #         SELECT *
+    #         FROM `poc-piloturl-nonprod.gold_layer.interactions`
+    #         WHERE user_id = @student_id
+    #         """     
+    #         job_config = bigquery.QueryJobConfig(
+    #             query_parameters=[
+    #                 bigquery.ScalarQueryParameter(
+    #                     "student_id",
+    #                     "STRING",
+    #                     student_id
+    #                 )
+    #             ]
+    #         )
+    #         job = self.client.query(query, job_config=job_config)
+    #     return job.to_dataframe() 
+
+    def get_interactions(self, student_id: Optional[str] = None):
+
+        table_id = f"{self.project}.{self.dataset}.{self.tables['interactions']}"
+
         if student_id is None:
-            query = """
+            query = f"""
             SELECT *
-            FROM `poc-piloturl-nonprod.gold_layer.interactions`
+            FROM `{table_id}`
             """
             job = self.client.query(query)
         else:
-            query = """
+            query = f"""
             SELECT *
-            FROM `poc-piloturl-nonprod.gold_layer.interactions`
+            FROM `{table_id}`
             WHERE user_id = @student_id
-            """     
+            """
             job_config = bigquery.QueryJobConfig(
                 query_parameters=[
                     bigquery.ScalarQueryParameter(
@@ -53,32 +117,64 @@ class DataQuery:
                 ]
             )
             job = self.client.query(query, job_config=job_config)
-        return job.to_dataframe() 
+
+        return job.to_dataframe()
     
+    # def get_user_events_json(self):
+    #     query = """
+    #     SELECT *
+    #     FROM `poc-piloturl-nonprod.gold_layer.feeds`
+    #     """
+    #     df = self.client.query(query).to_dataframe()
+    #     # ensure created_at is ISO-8601 Z format
+    #     df["created_at"] = df["created_at"].dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    #     feeds_lookup: Dict[str, Dict[str, Any]] = {}
+    #     for _,row in df.iterrows():
+    #         feed_id = row["feed_id"]
+    #         feeds_lookup[feed_id] = {
+    #             "feed_id"        : feed_id,
+    #             "title"          : row["title"],
+    #             "feed_text"      : row["feed_text"],
+    #             "tags"           : row["tags"],                     
+    #             "language"       : row["language"],
+    #             "created_at"     : row["created_at"],
+    #             "source"         : row["source"],
+    #             "url"            : row["url"],
+    #             "views"          : int(row["views"]),
+    #             "embedding_input": row["embedding_input"]
+    #         }
+    #     return feeds_lookup
     def get_user_events_json(self):
-        query = """
+
+        table_id = f"{self.project}.{self.dataset}.{self.tables['feeds']}"
+
+        query = f"""
         SELECT *
-        FROM `poc-piloturl-nonprod.gold_layer.feeds`
+        FROM `{table_id}`
         """
+
         df = self.client.query(query).to_dataframe()
-        # ensure created_at is ISO-8601 Z format
+
         df["created_at"] = df["created_at"].dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        feeds_lookup: Dict[str, Dict[str, Any]] = {}
-        for _,row in df.iterrows():
+        feeds_lookup = {}
+
+        for _, row in df.iterrows():
             feed_id = row["feed_id"]
             feeds_lookup[feed_id] = {
-                "feed_id"        : feed_id,
-                "title"          : row["title"],
-                "feed_text"      : row["feed_text"],
-                "tags"           : row["tags"],                     
-                "language"       : row["language"],
-                "created_at"     : row["created_at"],
-                "source"         : row["source"],
-                "url"            : row["url"],
-                "views"          : int(row["views"]),
-                "embedding_input": row["embedding_input"]
+                "feed_id": feed_id,
+                "title": row["title"],
+                "feed_text": row["feed_text"],
+                "tags": row["tags"],
+                "language": row["language"],
+                "created_at": row["created_at"],
+                "source": row["source"],
+                "url": row["url"],
+                "views": int(row["views"]),
+                "embedding_input": row["embedding_input"],
             }
+
         return feeds_lookup
     
     ### ---------- Upload data ---------- ###
