@@ -11,6 +11,13 @@ from google import genai
 
 from src.functions.utils.cloudstorage import GoogleCloudStorage
 from src.functions.core.hydegenerator import HydeGenerator
+import logging
+
+# Disable verbose logs from LLM client
+logging.getLogger("src.functions.utils.llm_client").setLevel(logging.ERROR)
+
+# Optional: reduce Google SDK logs
+logging.getLogger("google").setLevel(logging.WARNING)
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",

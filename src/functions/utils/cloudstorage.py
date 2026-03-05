@@ -50,7 +50,7 @@ class GoogleCloudStorage:
             folder_path += "/"
         blob = self.bucket.blob(folder_path)
         blob.upload_from_string("")
-        print(f"Folder created : gs://{self.bucket}/{folder_path}")
+        # print(f"Folder created : gs://{self.bucket}/{folder_path}")
         
     ### ---------- Remove function ----------- ###
     def delete_blob(self, blob_path):
@@ -77,7 +77,7 @@ class GoogleCloudStorage:
             json.dumps(json_data,ensure_ascii = False),
             content_type = "application/json"
         )
-        print(f"uploaded JSON -> gs://{self.bucket.name}/{blob_path}")
+        # print(f"uploaded JSON -> gs://{self.bucket.name}/{blob_path}")
     def upload_text(self, blob_path, text_data):
         '''upload text file to bucket'''
         blob   = self.bucket.blob(blob_path)
@@ -85,7 +85,7 @@ class GoogleCloudStorage:
             text_data,
             content_type = "text/plain"
         )
-        print(f"Uploaded text -> gs://{self.bucket.name}/{blob_path}")
+        # print(f"Uploaded text -> gs://{self.bucket.name}/{blob_path}")
     def upload_npy(self, blob_path, array):
         '''upload embedding vector'''
         buffer = io.BytesIO()
@@ -96,7 +96,7 @@ class GoogleCloudStorage:
             buffer,
             content_type = "application/octet-stream"
         )
-        print(f"Uploaded NPY  -> gs://{self.bucket.name}/{blob_path}")
+        # print(f"Uploaded NPY  -> gs://{self.bucket.name}/{blob_path}")
         
     ### ---------- Read file from GCS ---------- ###
     def read_json(self,blob_path:str) -> dict:

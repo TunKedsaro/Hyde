@@ -29,4 +29,5 @@ db-dtypes
 
 # --- CloudStorage ---
 google-cloud-storage
+google-cloud-bigquery-storage
 
