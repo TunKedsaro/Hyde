@@ -62,6 +62,8 @@ llm:
   model_name: gemini-3.1-flash-lite-preview
   max_output_tokens: 2048
   temperature: 0.2
+  slow_time: 30
+  output_dim: 768
   # USED:
   # - model_name, max_output_tokens, temperature
   #   are consumed by GeminiJsonClient

@@ -370,7 +370,7 @@ class GeminiJsonClient:
         - The only "repair" is safe auto-close of braces/brackets when JSON is truncated.
         """
         attempt_no = {"n": 0}
-        print(f"attempt_no -> {attempt_no}")
+        # print(f"attempt_no -> {attempt_no}")
 
         @self._retry_decorator
         def _call_once() -> Dict[str, Any]:
@@ -382,8 +382,8 @@ class GeminiJsonClient:
             # Use perf_counter for monotonic, stable latency measurement.
             t0 = time.perf_counter()
 
-            print(f"prompt -> {prompt}")
-            print(f"model -> {self.model_name}")
+            # print(f"prompt -> {prompt}")
+            # print(f"model -> {self.model_name}")
             resp = self._client.models.generate_content(
                 model=self.model_name,
                 contents=prompt,
@@ -406,9 +406,9 @@ class GeminiJsonClient:
             #     ),
             # )
 
-            print(f"prompt -> {prompt}")
-            print(f"resp -> {resp}")
-            print("="*100)
+            # print(f"prompt -> {prompt}")
+            # print(f"resp -> {resp}")
+            # print("="*100)
 
             latency_s = time.perf_counter() - t0
             in_tok, out_tok = _extract_token_usage(resp)

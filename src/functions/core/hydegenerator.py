@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import time
 import io
+import json
 
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional, Tuple
@@ -43,36 +44,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 def prettyjson(txt:str) -> str:
     return str(json.dumps(txt,indent=4, ensure_ascii=False))
 
-
-def save_timing_to_excel(
-    *,
-    student_id: str,
-    timing_ms: Dict[str, float],
-    file_path: str = "hyde_timing_report.xlsx",
-):
-    """
-    Save timing report to Excel.
-    If file exists → append new row.
-    If not → create new file.
-    """
-    # 1️ Prepare single-row dataframe
-    row_dict = {"student_id": student_id}
-    row_dict.update(timing_ms)
-    df_new = pd.DataFrame([row_dict])
-    # 2️ If file exists → append
-    if os.path.exists(file_path):
-        df_old = pd.read_excel(file_path)
-        df_final = pd.concat([df_old, df_new], ignore_index=True)
-    else:
-        df_final = df_new
-    # 3 Save
-    df_final.to_excel(file_path, index=False)
-    # print(f"Timing report saved to {file_path}")
-
-
 ### ---------- initail value ---------- ###
 class HydeGenerator(GoogleCloudStorage,DataQuery):
-    def __init__(self,bucket_name:str,verbose:int=0):
+    def __init__(self,bucket_name:str, verbose:int=0):
         self.cgs     = GoogleCloudStorage(bucket_name=bucket_name)
         self.dq      = DataQuery()
         self.cfg     = load_config()
@@ -120,6 +94,7 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             include_recent_feeds,
             query_embedding_model_name,
         )
+    
     def _load_prompts(self) -> Dict[str, str]:
         """
         Load HyDE prompt templates from parameters/prompts.yaml.
@@ -200,211 +175,199 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             out.append(str(it.get("query_text") or "").strip())
         return out
     
-    def _upload_to_cgs(self,student_id,metadata,embedding,hyde_json):
-        self.cgs.upload_json(
-            blob_path   = f"{student_id}/metadata/metadata.json",
-            json_data   = metadata
-        )
-        self.cgs.upload_npy(
-            blob_path   = f"{student_id}/embedding/embedding01.npy",
-            array       = embedding[0]
-        )
-        self.cgs.upload_npy(
-            blob_path   = f"{student_id}/embedding/embedding02.npy",
-            array       = embedding[1]
-        )
-        self.cgs.upload_npy(
-            blob_path   = f"{student_id}/embedding/embedding03.npy",
-            array       = embedding[2]
-        )
-        self.cgs.upload_npy(
-            blob_path   = f"{student_id}/embedding/embedding04.npy",
-            array       = embedding[3]
-        )
-        self.cgs.upload_npy(
-            blob_path   = f"{student_id}/embedding/embedding05.npy",
-            array       = embedding[4]
-        )
-        self.cgs.upload_json(
-            blob_path = f"{student_id}/hyde/hyde.json",
-            json_data = hyde_json
-        )
-        # self.cgs.upload_json(
-        #     blob_path = f"{student_id}/hyde/hyde_text02.json",
-        #     json_data = hyde_json['hyde_queries'][1]
-        # )
-        # self.cgs.upload_json(
-        #     blob_path = f"{student_id}/hyde/hyde_text03.json",
-        #     json_data = hyde_json['hyde_queries'][2]
-        # )
-        # self.cgs.upload_json(
-        #     blob_path = f"{student_id}/hyde/hyde_text04.json",
-        #     json_data = hyde_json['hyde_queries'][3]
-        # )
-        # self.cgs.upload_json(
-        #     blob_path = f"{student_id}/hyde/hyde_text05.json",
-        #     json_data = hyde_json['hyde_queries'][4]
-        # )
-        # self.cgs.upload_text(
-        #     blob_path = f"{student_id}/hyde/hyde_text01.txt",
-        #     text_data = hyde[0]
-        # )
-        # self.cgs.upload_text(
-        #     blob_path = f"{student_id}/hyde/hyde_text02.txt",
-        #     text_data = hyde[1]
-        # )
-        # self.cgs.upload_text(
-        #     blob_path = f"{student_id}/hyde/hyde_text03.txt",
-        #     text_data = hyde[2]
-        # )
-        # self.cgs.upload_text(
-        #     blob_path = f"{student_id}/hyde/hyde_text04.txt",
-        #     text_data = hyde[3]
-        # )
-        # self.cgs.upload_text(
-        #     blob_path = f"{student_id}/hyde/hyde_text05.txt",
-        #     text_data = hyde[4]
-        # )
-    
     #----------------------------------------------------------------------
     # main pipeline
     #----------------------------------------------------------------------
-    def student_feed_id(self, user_id: str):
-        client = bigquery.Client()
-        query = """
-            SELECT *
-            FROM `poc-piloturl-nonprod.gold_layer.interactions`
-            WHERE user_id = @user_id
+    def _interactions_to_json(self, interactions_df, student_id)->List[Dict]:
         """
-        job_config = bigquery.QueryJobConfig(
-            query_parameters=[
-                bigquery.ScalarQueryParameter("user_id", "STRING", user_id)
+        Convert interactions records for a specific student into JSON format
+        Return
+        ------
+        List[Dict]
+            [
+                {
+                    "user_id": "stu_p001",
+                    "feed_id": "TH_F008",
+                    "ts": "2026-01-04 14:05:02+00:00",
+                    "event_type": "click",
+                    "dwell_ms": 0
+                },
+                {},
+                {}
             ]
-        )
-        rows = client.query(query, job_config=job_config).result()
-        return [
-            {k: str(v) for k, v in dict(row).items()}
-            for row in rows
-        ]
+        """
+        df = interactions_df[interactions_df["user_id"] == student_id].copy()
+        df["ts"] = df["ts"].astype(str)
+        records = df.to_dict(orient="records")
+        return records
     
+    def _upload_to_cgs(self,student_id,metadata,embedding,hyde_json):
+        """
+        Upload a HyDE bundle to Google Cloud Storage.
 
-    def single_student_generator(self,student_id:str):
+        Packages HyDE generation results for a student into a single JSON object
+        containing metadata, generated queries, and embedding vectors, then uploads
+        it to GCS.
 
-        t0_total = time.perf_counter()
-        timing_ms : Dict[str,float] = {}
+        Parameters
+        ----------
+        student_id : str
+            Student identifier.
+        metadata : Dict[str, Any]
+            Generation metadata.
+        embedding : np.ndarray
+            Query embedding vectors (expected shape: 5 x embedding_dim).
+        hyde_json : Dict[str, Any]
+            HyDE generator output containing synthetic queries under key "hq".
+        """
+        emb_list = embedding.tolist()
+        bundle = {
+            "student_id": student_id,
+            "metadata": metadata,
+            "hyde_queries": hyde_json.get("hq", []),
+            "embeddings": {
+                "embedding01": emb_list[0],
+                "embedding02": emb_list[1],
+                "embedding03": emb_list[2],
+                "embedding04": emb_list[3],
+                "embedding05": emb_list[4],
+            }
+        }
+        # print(bundle)
+        self.cgs.upload_json(
+            blob_path=f"{student_id}/hyde_bundle.json",
+            json_data=bundle
+        )
 
+    def single_hyde_generator2(self, 
+                                student_id:str,
+                                students = None,
+                                interactions = None,
+                                feeds_lookup = None
+                            ):
         status = "Complete"
+        failed_students = []
+        slow_students   = []
+        t0_total        = time.perf_counter()
         try:
-            ### ----------- initail value ----------- ###
+            # --------------------------------------------------
+            # 1. Download data
+            # --------------------------------------------------
             t0 = time.perf_counter()
-            students     = self.dq.get_students(student_id)       # TODO : change this method to overwrite for case () and identify student id to reduce time
-            interactions = self.dq.get_interactions(student_id)   # TODO : change this method to overwrite for case () and identify student id to reduce time
-            feeds_lookup = self.dq.get_user_events_json()         # TODO : change this method to overwrite for case () and identify student id to reduce time
-            timing_ms["download_data_ms"] = (time.perf_counter() - t0) * 1000
-            now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-
-            ### ----------- read HyDe-related configureation once ----------- ###
+            if students is None:
+                students     = self.dq.get_students()
+            if interactions is None:
+                interactions = self.dq.get_interactions()
+            if feeds_lookup is None:
+                feeds_lookup = self.dq.get_user_events_json()
+            download_ms  = (time.perf_counter()-t0)*1000
+            now_iso      = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+            # print(f"student_id -> {student_id}")
+            # print(f"students -> {students}")
+            # print(f"interactions -> {interactions}")
+            # print(f"feeds_lookup -> {feeds_lookup}")
+            print(f"Download time: {(download_ms/1000):.2f}s")
+            # --------------------------------------------------
+            # 2. Config
+            # --------------------------------------------------
             t0 = time.perf_counter()
-            history_threshold,recent_k,feed_text_max_chars,include_recent_feeds,query_embedding_model_name = self._read_hyde_config(self.cfg)
-            expected_dim = int(self.cfg.get("embeddings", {}).get("dim", 0) or 0)
-            timing_ms["read_config_ms"] = (time.perf_counter() - t0) * 1000
-
-            ### ----------- Hyde prompt ----------- ###
+            history_threshold, recent_k, feed_text_max_chars, include_recent_feeds, query_embedding_model_name = self._read_hyde_config(self.cfg)
+            read_config_ms = (time.perf_counter() - t0) * 1000
+            expected_dim = int(self.cfg.get("embeddings",{}).get("dim",0) or 0)
+            # --------------------------------------------------
+            # 3. Load prompts + client
+            # --------------------------------------------------
             t0 = time.perf_counter()
             prompts = self._load_prompts()
-            if not prompts:
-                raise ValueError("hyde_prompts missing from parameters/prompts.yaml")
             client = build_llm_client_from_yaml(
-                parameters_path=str(PROJECT_ROOT / "parameters" / "parameters.yaml")
-                )
-            timing_ms["load_prompt_and_client_ms"] = (time.perf_counter() - t0) * 1000
-
-            ### ---------- 01 locate student row ---------- ###
-            student_row_df = students[students["student_id"] == student_id]  # get student that we want from dataframe
-            if len(student_row_df) == 0:                                     # check there are only one student
-                raise ValueError(f"student_id {student_id} not found")
-            student_row = student_row_df.iloc[0].to_dict()                   # ddataframe -> dict
-
-            ### ---------- 02 build context ---------- ###
-            t0 = time.perf_counter()
-            user_ctx = build_user_context(student_row)                       # create user context class
-            pref_lang = user_ctx.user_context_json.get("preferred_language", "th")
-            user_events = interactions[interactions["user_id"] == student_id] # get user envent table
-            num_events = int(len(user_events))
-            if num_events > 0:
-                history_summary_text = build_history_summary(                # build history summary
-                    user_events,
-                    preferred_language=pref_lang,
-                    include_recent_feeds=include_recent_feeds,
-                    recent_k=recent_k,
-                    feeds_lookup=feeds_lookup or None,
-                    feed_text_max_chars=feed_text_max_chars,
+                parameters_path = str(PROJECT_ROOT/"parameters"/"parameters.yaml")
             )
-            timing_ms["build_context_ms"] = (time.perf_counter() - t0) * 1000
-
-            ### ---------- 03 build prompt ---------- ###
+            load_prompt_client_ms = (time.perf_counter() - t0) * 1000
+            # --------------------------------------------------
+            # 4. Locate student
+            # --------------------------------------------------
+            student_row_df = students[students["student_id"] == student_id]
+            if len(student_row_df) == 0:
+                raise ValueError(f"{student_id} not found")
+            student_row = student_row_df.iloc[0].to_dict()
+            # print(f"\nProcessing {student_id}")
+            t0_student = time.perf_counter()
+            timing = {
+                "student_id" : student_id,
+                "download_data_ms" : round(download_ms,2),
+                "read_config_ms" : round(read_config_ms,2),
+                "load_prompt_and_client_ms" : round(load_prompt_client_ms,2)
+            }
+            # ----------------------------
+            # 5. Context
+            # ----------------------------
+            t0 = time.perf_counter()
+            user_ctx = build_user_context(student_row)
+            pref_lang = user_ctx.user_context_json.get("preferred_language", "th")
+            # pref_lang = "th"  # TODO : change it later but for now there are only th feeds
+            user_events = interactions[interactions["user_id"] == student_id]
+            num_events  = len(user_events)
+            history_summary_text = ""
+            if num_events > 0:
+                history_summary_text = build_history_summary(
+                        user_events,
+                        preferred_language = pref_lang,
+                        include_recent_feeds = include_recent_feeds,
+                        recent_k = recent_k,
+                        feeds_lookup = feeds_lookup or None,
+                        feed_text_max_chars = feed_text_max_chars
+                )
+            timing["build_context_ms"] = round((time.perf_counter() - t0) * 1000,2)
+            # ----------------------------
+            # 6. Prompt
+            # ----------------------------
             t0 = time.perf_counter()
             prompt_key = self._choose_hyde_prompt_key(num_events, history_threshold)
-            print(f"prompt_key -> {prompt_key}")
             template = prompts.get(prompt_key)
             if not template:
-                raise ValueError(f"Missing prompt '{prompt_key}'")
+                raise ValueError(f"Missing prompt {prompt_key}")
             prompt = self._render_prompt(
                 template=template,
                 preferred_language=pref_lang,
                 user_context_text=user_ctx.user_context_text,
                 history_summary_text=history_summary_text,
             )
-            timing_ms["build_prompt_ms"] = (time.perf_counter() - t0) * 1000
-
-            ### ---------- 04 LLM call ---------- ###
+            timing["build_prompt_ms"] = round((time.perf_counter() - t0) * 1000, 2)
+            # ----------------------------
+            # 7. LLM
+            # ----------------------------
             t0 = time.perf_counter()
             hyde_json = client.generate_json(prompt)
-            # print(f"hyde_json -> {hyde_json}")
-            timing_ms["llm_call_ms"] = (time.perf_counter() - t0) * 1000
-
-
-            ### ---------- 05 Shin embedding ---------- ###
+            llm_time = time.perf_counter() - t0
+            timing["llm_call_ms"] = round(llm_time * 1000,2)
+            slow_time = self.cfg["llm"]["slow_time"]
+            if llm_time > slow_time:
+                print(f"⚠ Slow LLM ({llm_time:.2f}s)")
+                slow_students.append(student_id)
+            # ----------------------------
+            # 8. Extract queries
+            # ----------------------------       
+            hyde_query_text = self._extract_hyde_query_texts(hyde_json)
+            # ----------------------------
+            # 9. Embedding
+            # ----------------------------   
             t0 = time.perf_counter()
-            hyde_query_texts = self._extract_hyde_query_texts(hyde_json)
-
-            if hyde_query_texts:
+            output_dim = self.cfg["llm"]["output_dim"]
+            if hyde_query_text:
                 emb = embed_texts_gemini(
-                    texts=hyde_query_texts,
-                    output_dim=768,
+                    texts  = hyde_query_text,
+                    output_dim = output_dim,
                     task_type="RETRIEVAL_DOCUMENT",
-                )
+                )         
                 if emb.ndim != 2:
                     raise ValueError(f"Invalid embedding shape {emb.shape}")
-                dim = int(emb.shape[1])
             else:
-                dim = expected_dim or 0
-                emb = np.zeros((0, dim), dtype=np.float32)
-            timing_ms["embedding_ms"] = (time.perf_counter() - t0) * 1000
-
-            ### ---------- 06 save bundle locally ---------- ###
-            bundle = {
-                "bundle_version": "v2_hyde_embedded_queries",
-                "student_id": student_id,
-                "generated_at": now_iso,
-                "prompt_key": prompt_key,
-                "preferred_language": pref_lang,
-                "num_events": num_events,
-                "user_context_json": user_ctx.user_context_json,
-                "user_context_text": user_ctx.user_context_text,
-                "history_summary_text": history_summary_text,
-                "hyde_output": hyde_json,
-            }
-            if self.verbose:
-                print(bundle)
+                emb = np.zeros((0, expected_dim), dtype=np.float32)
             
-            ### ---------- 07 upload to GCS ---------- ###
+            # ----------------------------
+            # 10. Upload
+            # ----------------------------
             t0 = time.perf_counter()
-
-            self.cgs.create_folder(f"{student_id}/metadata/")
-            self.cgs.create_folder(f"{student_id}/hyde/")
-            self.cgs.create_folder(f"{student_id}/embedding/")
-
             metadata = {
                 "student_id"          :student_id, # 
                 "current_status"      :student_row['current_status'], #
@@ -416,672 +379,128 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                 "max_output_tokens"   :self.cfg["llm"]["max_output_tokens"], #
                 "feed_text_max_chars" :self.cfg["hyde"]["feed_text_max_chars"], #
                 "temperature"         :self.cfg["llm"]["temperature"], #
-                "interaction"         :self.student_feed_id(student_id)
+                "interaction"         :self._interactions_to_json(interactions,student_id)
             }
             self._upload_to_cgs(
                 student_id = student_id,
                 metadata   = metadata,
                 embedding  = emb,
-                # hyde       = hyde_query_texts,
-                hyde_json  = {"hq":hyde_json['hyde_queries']}
+                hyde_json  = {
+                    "hq" : hyde_json.get("hyde_queries", [])
+                    },
             )
-            timing_ms["upload_gcs_ms"] = (time.perf_counter() - t0) * 1000
-
+            timing["upload_gcs_ms"] = round((time.perf_counter() - t0)*1000,2)
+            timing["total_ms"]      = round((time.perf_counter() - t0_student)*1000,2)
+            timing["status"]        = "done"
+            print(f"✅ Done {student_id} in {(time.perf_counter()-t0_student):.2f}s")
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            print(f"❌ Failed {student_id} → {str(e)}")
             status = "Fail"
-
-        # start counting total process
-        timing_ms["total_ms"] = (time.perf_counter() - t0_total) * 1000
-        print("Timing summary (ms):", timing_ms)
-
-        return {
-            "status": status,
-            "timing": timing_ms
+            failed_students.append({
+                "student_id":student_id,
+                "error":str(e)
+            })
+            timing = {
+            "student_id": student_id,
+            "status": str(e)
         }
-    # # legacy
-    # def batch_student_generator(self):
-    #     status = "Complete"
-    #     student_id_updated = []
-    #     failed_students    = []
-    #     slow_students      = []
-    #     timing_rows        = []
-    #     t0_total = time.perf_counter()
-    #     try:
-    #         # --------------------------------------------------
-    #         # 1. Download data once
-    #         # --------------------------------------------------
-    #         t0 = time.perf_counter()
-    #         students     = self.dq.get_students()
-    #         interactions = self.dq.get_interactions()
-    #         feeds_lookup = self.dq.get_user_events_json()
-    #         download_ms  = (time.perf_counter() - t0) * 1000
-    #         now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-    #         print(f"Download time: {(download_ms/1000):.2f}s")
 
-    #         # --------------------------------------------------
-    #         # 2. Config
-    #         # --------------------------------------------------
-    #         t0 = time.perf_counter()
-    #         history_threshold, recent_k, feed_text_max_chars, include_recent_feeds, query_embedding_model_name = self._read_hyde_config(self.cfg)
-    #         read_config_ms = (time.perf_counter() - t0) * 1000
-    #         expected_dim = int(self.cfg.get("embeddings", {}).get("dim", 0) or 0)
-    #         t0 = time.perf_counter()
-    #         prompts = self._load_prompts()
-    #         client = build_llm_client_from_yaml(
-    #             parameters_path=str(PROJECT_ROOT / "parameters" / "parameters.yaml")
-    #         )
-    #         load_prompt_client_ms = (time.perf_counter() - t0) * 1000
-
-    #         # --------------------------------------------------
-    #         # 3. Loop students safely
-    #         # --------------------------------------------------
-    #         for idx, row in students.iterrows():
-    #             t0_student = time.perf_counter()
-    #             student_row = row.to_dict()
-    #             student_id = str(student_row.get("student_id", "")).strip()
-    #             print(f"\nProcessing {student_id} ({idx+1}/{len(students)})")
-    #             timing = {
-    #                 "student_id": student_id,
-    #                 "download_data_ms": round(download_ms,2),
-    #                 "read_config_ms": round(read_config_ms,2),
-    #                 "load_prompt_and_client_ms": round(load_prompt_client_ms,2),
-    #             }
-    #             try:
-    #                 # ----------------------------
-    #                 # Context
-    #                 # ----------------------------
-    #                 t0 = time.perf_counter()
-    #                 user_ctx = build_user_context(student_row)
-    #                 pref_lang = user_ctx.user_context_json.get("preferred_language", "th")
-    #                 user_events = interactions[interactions["user_id"] == student_id]
-    #                 num_events = len(user_events)
-    #                 history_summary_text = ""
-    #                 if num_events > 0:
-    #                     history_summary_text = build_history_summary(
-    #                         user_events,
-    #                         preferred_language=pref_lang,
-    #                         include_recent_feeds=include_recent_feeds,
-    #                         recent_k=recent_k,
-    #                         feeds_lookup=feeds_lookup or None,
-    #                         feed_text_max_chars=feed_text_max_chars,
-    #                     )
-    #                 timing["build_context_ms"] = round((time.perf_counter() - t0) * 1000,2)
-    #                 # ----------------------------
-    #                 # Prompt
-    #                 # ----------------------------
-    #                 t0 = time.perf_counter()
-    #                 prompt_key = self._choose_hyde_prompt_key(num_events, history_threshold)
-    #                 template = prompts.get(prompt_key)
-    #                 if not template:
-    #                     raise ValueError(f"Missing prompt {prompt_key}")
-    #                 prompt = self._render_prompt(
-    #                     template=template,
-    #                     preferred_language=pref_lang,
-    #                     user_context_text=user_ctx.user_context_text,
-    #                     history_summary_text=history_summary_text,
-    #                 )
-    #                 timing["build_prompt_ms"] = round((time.perf_counter() - t0) * 1000,2)
-
-    #                 # ----------------------------
-    #                 # LLM CALL
-    #                 # ----------------------------
-    #                 t0 = time.perf_counter()
-    #                 hyde_json = client.generate_json(prompt)
-    #                 llm_time = time.perf_counter() - t0
-    #                 timing["llm_call_ms"] = round(llm_time * 1000,2)
-    #                 if llm_time > 20:
-    #                     print(f"⚠ Slow LLM ({llm_time:.2f}s) → skip")
-    #                     slow_students.append(student_id)
-    #                 # ----------------------------
-    #                 # Extract queries
-    #                 # ----------------------------
-    #                 print(f"hyde_json -> {hyde_json}")
-    #                 hyde_query_texts = self._extract_hyde_query_texts(hyde_json)
-    #                 # ----------------------------
-    #                 # Embedding
-    #                 # ----------------------------
-    #                 t0 = time.perf_counter()
-    #                 if hyde_query_texts:
-    #                     emb = embed_texts_gemini(
-    #                         texts=hyde_query_texts,
-    #                         output_dim=768,
-    #                         task_type="RETRIEVAL_DOCUMENT",
-    #                     )
-    #                     if emb.ndim != 2:
-    #                         raise ValueError(f"Invalid embedding shape {emb.shape}")
-    #                 else:
-    #                     emb = np.zeros((0, expected_dim), dtype=np.float32)
-    #                 timing["embedding_ms"] = round((time.perf_counter() - t0) * 1000,2)
-
-    #                 # ----------------------------
-    #                 # Upload
-    #                 # ----------------------------
-    #                 t0 = time.perf_counter()
-    #                 metadata = {
-    #                     "student_id": student_id,
-    #                     "generated_at": now_iso,
-    #                     "model": self.cfg["llm"]["model_name"],
-    #                 }
-    #                 self._upload_to_cgs(
-    #                     student_id=student_id,
-    #                     metadata=metadata,
-    #                     embedding=emb,
-    #                     hyde_json={"hq": hyde_json.get("hyde_queries", [])}
-    #                 )
-    #                 timing["upload_gcs_ms"] = round((time.perf_counter() - t0) * 1000,2)
-    #                 timing["total_ms"] = round((time.perf_counter() - t0_student) * 1000,2)
-    #                 timing["status"] = "done"
-    #                 student_id_updated.append(student_id)
-    #                 print(f"✅ Done {student_id} in {(time.perf_counter()-t0_student):.2f}s")
-    #             except Exception as e:
-    #                 print(f"❌ Failed {student_id} → {str(e)}")
-    #                 failed_students.append({
-    #                     "student_id": student_id,
-    #                     "error": str(e)
-    #                 })
-    #                 timing["build_context_ms"] = "-"
-    #                 timing["build_prompt_ms"] = "-"
-    #                 timing["llm_call_ms"] = "-"
-    #                 timing["embedding_ms"] = "-"
-    #                 timing["upload_gcs_ms"] = "-"
-    #                 timing["total_ms"] = "-"
-    #                 timing["status"] = str(e)
-    #             timing_rows.append(timing)
-    #     except Exception as e:
-    #         status = "Fail"
-    #         print("Batch crashed:", e)
-
-    #     # --------------------------------------------------
-    #     # Save timing report
-    #     # --------------------------------------------------
-    #     timestamp = datetime.now().strftime("%y%m%d_%H%M")
-    #     df_new = pd.DataFrame(timing_rows)
-    #     file_path = f"hyde_timing_report_{timestamp}.xlsx"
-    #     if os.path.exists(file_path):
-    #         df_old = pd.read_excel(file_path)
-    #         df_final = pd.concat([df_old, df_new], ignore_index=True)
-    #     else:
-    #         df_final = df_new
-    #     df_final.to_excel(file_path, index=False)
-    #     total_time = round(time.perf_counter() - t0_total, 2)
-    #     print("\nBatch Finished")
-    #     print("Updated:", len(student_id_updated))
-    #     print("Failed:", len(failed_students))
-    #     print("Slow:", len(slow_students))
-    #     print("Total Time (sec):", total_time)
-    #     return student_id_updated, status
-
-    def batch_student_generator(self):
-
-        status = "Complete"
-        student_id_updated = []
-        failed_students    = []
-        slow_students      = []
-        timing_rows        = []
-
-        t0_total = time.perf_counter()
-        try:
-            # --------------------------------------------------
-            # 1. Download data once
-            # --------------------------------------------------
-            t0 = time.perf_counter()
-            students     = self.dq.get_students()
-            interactions = self.dq.get_interactions()
-            feeds_lookup = self.dq.get_user_events_json()
-            download_ms  = (time.perf_counter() - t0) * 1000
-            now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-            print(f"Download time: {(download_ms/1000):.2f}s")
-            # --------------------------------------------------
-            # 2. Config
-            # --------------------------------------------------
-            t0 = time.perf_counter()
-            history_threshold, recent_k, feed_text_max_chars, include_recent_feeds, query_embedding_model_name = self._read_hyde_config(self.cfg)
-            read_config_ms = (time.perf_counter() - t0) * 1000
-            expected_dim = int(self.cfg.get("embeddings", {}).get("dim", 0) or 0)
-            t0 = time.perf_counter()
-            prompts = self._load_prompts()
-            client = build_llm_client_from_yaml(
-                parameters_path=str(PROJECT_ROOT / "parameters" / "parameters.yaml")
-            )
-            load_prompt_client_ms = (time.perf_counter() - t0) * 1000
-            # --------------------------------------------------
-            # 3. Loop students safely
-            # --------------------------------------------------
-            total_students = len(students)
-            for idx, row in students.iterrows():
-                t0_student = time.perf_counter()
-                student_row = row.to_dict()
-                student_id = str(student_row.get("student_id", "")).strip()
-                print(f"\nProcessing {student_id} ({idx+1}/{total_students})")
-                timing = {
-                    "student_id": student_id,
-                    "download_data_ms": round(download_ms,2),
-                    "read_config_ms": round(read_config_ms,2),
-                    "load_prompt_and_client_ms": round(load_prompt_client_ms,2),
-                }
-                try:
-                    # ----------------------------
-                    # Context
-                    # ----------------------------
-                    t0 = time.perf_counter()
-                    user_ctx = build_user_context(student_row)
-                    pref_lang = user_ctx.user_context_json.get("preferred_language", "th")
-                    user_events = interactions[interactions["user_id"] == student_id]
-                    num_events = len(user_events)
-                    history_summary_text = ""
-                    if num_events > 0:
-                        history_summary_text = build_history_summary(
-                            user_events,
-                            preferred_language=pref_lang,
-                            include_recent_feeds=include_recent_feeds,
-                            recent_k=recent_k,
-                            feeds_lookup=feeds_lookup or None,
-                            feed_text_max_chars=feed_text_max_chars,
-                        )
-                    timing["build_context_ms"] = round((time.perf_counter() - t0) * 1000,2)
-                    # ----------------------------
-                    # Prompt
-                    # ----------------------------
-                    t0 = time.perf_counter()
-                    prompt_key = self._choose_hyde_prompt_key(num_events, history_threshold)
-                    template = prompts.get(prompt_key)
-                    if not template:
-                        raise ValueError(f"Missing prompt {prompt_key}")
-                    prompt = self._render_prompt(
-                        template=template,
-                        preferred_language="th",
-                        # preferred_language=pref_lang,
-                        user_context_text=user_ctx.user_context_text,
-                        history_summary_text=history_summary_text,
-                    )
-                    timing["build_prompt_ms"] = round((time.perf_counter() - t0) * 1000,2)
-                    # ----------------------------
-                    # LLM CALL
-                    # ----------------------------
-                    t0 = time.perf_counter()
-                    hyde_json = client.generate_json(prompt)
-                    # print(f"hyde_json -> {prettyjson(hyde_json)}")
-                    llm_time = time.perf_counter() - t0
-                    timing["llm_call_ms"] = round(llm_time * 1000,2)
-                    if llm_time > 20:
-                        print(f"⚠ Slow LLM ({llm_time:.2f}s) → skip")
-                        slow_students.append(student_id)
-                    # ----------------------------
-                    # Extract queries
-                    # ----------------------------
-                    hyde_query_texts = self._extract_hyde_query_texts(hyde_json)
-                    # ----------------------------
-                    # Embedding
-                    # ----------------------------
-                    t0 = time.perf_counter()
-                    if hyde_query_texts:
-                        emb = embed_texts_gemini(
-                            texts=hyde_query_texts,
-                            output_dim=768,
-                            task_type="RETRIEVAL_DOCUMENT",
-                        )
-                        if emb.ndim != 2:
-                            raise ValueError(f"Invalid embedding shape {emb.shape}")
-                    else:
-                        emb = np.zeros((0, expected_dim), dtype=np.float32)
-                    timing["embedding_ms"] = round((time.perf_counter() - t0) * 1000,2)
-                    # ----------------------------
-                    # Upload
-                    # ----------------------------
-                    t0 = time.perf_counter()
-                    metadata = {
-                        "student_id": student_id,
-                        "generated_at": now_iso,
-                        "model": self.cfg["llm"]["model_name"],
-                    }
-                    self._upload_to_cgs(
-                        student_id=student_id,
-                        metadata=metadata,
-                        embedding=emb,
-                        hyde_json={"hq": hyde_json.get("hyde_queries", [])}
-                    )
-                    timing["upload_gcs_ms"] = round((time.perf_counter() - t0) * 1000,2)
-                    timing["total_ms"] = round((time.perf_counter() - t0_student) * 1000,2)
-                    timing["status"] = "done"
-                    student_id_updated.append(student_id)
-                    print(f"✅ Done {student_id} in {(time.perf_counter()-t0_student):.2f}s")
-                except Exception as e:
-                    print(f"❌ Failed {student_id} → {str(e)}")
-                    failed_students.append({
-                        "student_id": student_id,
-                        "error": str(e)
-                    })
-                    timing["build_context_ms"] = "-"
-                    timing["build_prompt_ms"] = "-"
-                    timing["llm_call_ms"] = "-"
-                    timing["embedding_ms"] = "-"
-                    timing["upload_gcs_ms"] = "-"
-                    timing["total_ms"] = "-"
-                    timing["status"] = str(e)
-                timing_rows.append(timing)
-        except Exception as e:
-            status = "Fail"
-            print("Batch crashed:", e)
-        # --------------------------------------------------
-        # Save timing report
-        # --------------------------------------------------
-        timestamp = datetime.now().strftime("%y%m%d_%H%M")
-        df_new = pd.DataFrame(timing_rows)
-        file_path = f"hyde_timing_report_{timestamp}.xlsx"
-        if os.path.exists(file_path):
-            df_old = pd.read_excel(file_path)
-            df_final = pd.concat([df_old, df_new], ignore_index=True)
-        else:
-            df_final = df_new
-        df_final.to_excel(file_path, index=False)
-        # --------------------------------------------------
-        # JSON Report for GCS
-        # --------------------------------------------------
-        total_time = round(time.perf_counter() - t0_total, 2)
-        report = {
-            "run_metadata": {
-                "generated_at": datetime.now(timezone.utc).isoformat(),
-                "total_students": total_students,
-                "updated_count": len(student_id_updated),
-                "failed_count": len(failed_students),
-                "slow_count": len(slow_students),
-                "total_time_sec": total_time,
-            },
-            "students": timing_rows,
-            "failed": failed_students,
-            "slow": slow_students
-        }
-        json_path = f"hyde_batch_report_{timestamp}.json"
-        try:
-            self.cgs.create_folder(f"report_{timestamp}/")
-            self.cgs.upload_json(
-                blob_path=f"report_{timestamp}/{json_path}",
-                json_data=report
-            )
-            print(f"Report uploaded to GCS → report_{timestamp}/{json_path}")
-        except Exception as e:
-            print(f"GCS report upload failed: {e}")
         # --------------------------------------------------
         # Summary
         # --------------------------------------------------
-        print("\nBatch Finished")
-        print("Updated:", len(student_id_updated))
-        print("Failed:", len(failed_students))
-        print("Slow:", len(slow_students))
+        total_time = round(time.perf_counter() - t0_total, 2)
+        # print("\nSingle Student Finished")
+        print("Status:", status)
         print("Total Time (sec):", total_time)
-        return student_id_updated, status
+        return {
+            "student_id": student_id,
+            "status": status,
+            "timing": timing,
+            "failed": failed_students,
+            "slow": slow_students,
+            "total_time_sec": total_time
+        }
 
-    def _safe_single_student_fast(
-        self,
-        student_id,
-        students_df,
-        interactions,
-        feeds_lookup,
-        prompts,
-        client,
-        now_iso,
-        history_threshold,
-        recent_k,
-        feed_text_max_chars,
-        include_recent_feeds,
-    ):
+    def sequential_of_single_student_generator(self):
+        t0_total  = time.perf_counter()
+        report_each_student = []
+        failed              = []
+        slow                = []
+        timing_rows         = []
 
-        t0_total = time.perf_counter()
-        timing = {}
-
-        try:
-
-            # ----------------------------
-            # Locate student row
-            # ----------------------------
-            student_row_df = students_df[students_df["student_id"] == student_id]
-
-            if len(student_row_df) == 0:
-                raise ValueError(f"{student_id} not found")
-
-            student_row = student_row_df.iloc[0].to_dict()
-
-            # ----------------------------
-            # Context
-            # ----------------------------
-            t0 = time.perf_counter()
-
-            user_ctx = build_user_context(student_row)
-
-            pref_lang = user_ctx.user_context_json.get("preferred_language", "th")
-
-            user_events = interactions[interactions["user_id"] == student_id]
-
-            num_events = len(user_events)
-
-            history_summary_text = ""
-
-            if num_events > 0:
-                history_summary_text = build_history_summary(
-                    user_events,
-                    preferred_language=pref_lang,
-                    include_recent_feeds=include_recent_feeds,
-                    recent_k=recent_k,
-                    feeds_lookup=feeds_lookup,
-                    feed_text_max_chars=feed_text_max_chars,
-                )
-
-            timing["build_context_ms"] = (time.perf_counter() - t0) * 1000
-
-            # ----------------------------
-            # Prompt
-            # ----------------------------
-            t0 = time.perf_counter()
-
-            prompt_key = self._choose_hyde_prompt_key(num_events, history_threshold)
-
-            template = prompts[prompt_key]
-
-            prompt = self._render_prompt(
-                template,
-                pref_lang,
-                user_ctx.user_context_text,
-                history_summary_text
-            )
-
-            timing["build_prompt_ms"] = (time.perf_counter() - t0) * 1000
-
-            # ----------------------------
-            # LLM Call
-            # ----------------------------
-            t0 = time.perf_counter()
-
-            hyde_json = client.generate_json(prompt)
-
-            timing["llm_call_ms"] = (time.perf_counter() - t0) * 1000
-
-            # ----------------------------
-            # Extract queries
-            # ----------------------------
-            hyde_query_texts = self._extract_hyde_query_texts(hyde_json)
-
-            # ----------------------------
-            # Embedding
-            # ----------------------------
-            t0 = time.perf_counter()
-
-            emb = embed_texts_gemini(
-                texts=hyde_query_texts,
-                output_dim=768,
-                task_type="RETRIEVAL_DOCUMENT",
-            )
-
-            timing["embedding_ms"] = (time.perf_counter() - t0) * 1000
-
-            # ----------------------------
-            # Upload to GCS
-            # ----------------------------
-            t0 = time.perf_counter()
-
-            metadata = {
-                "student_id": student_id,
-                "generated_at": now_iso,
-                "model": self.cfg["llm"]["model_name"],
-            }
-
-            self._upload_to_cgs(
-                student_id=student_id,
-                metadata=metadata,
-                embedding=emb,
-                hyde_json={"hq": hyde_json["hyde_queries"]}
-            )
-
-            timing["upload_gcs_ms"] = (time.perf_counter() - t0) * 1000
-
-            # ----------------------------
-            # Total time
-            # ----------------------------
-            timing["total_ms"] = (time.perf_counter() - t0_total) * 1000
-
-            return {
-                "status": "Complete",
-                "slow": timing["total_ms"] / 1000 > 20,
-                "timing": timing,
-                "student_id": student_id
-            }
-
-        except Exception as e:
-
-            return {
-                "status": "Fail",
-                "error": str(e),
-                "slow": False,
-                "student_id": student_id
-            }
+        students     = self.dq.get_students()
+        interactions = self.dq.get_interactions()
+        feeds_lookup = self.dq.get_user_events_json()
         
-            
-    def batch_student_async(
-        self,
-        student_ids: Optional[List[str]] = None,
-        max_workers: int = 5,
-    ):
-
-        status = "Complete"
-        updated = []
-        failed = []
-        slow = []
-        timing_rows = []
-
-        t0_total = time.perf_counter()
-        try:
-            # --------------------------------------------------
-            # 01 Download BigQuery data ONCE
-            # --------------------------------------------------
-            t0 = time.perf_counter()
-            students_df  = self.dq.get_students()
-            interactions = self.dq.get_interactions()
-            feeds_lookup = self.dq.get_user_events_json()
-            download_ms = (time.perf_counter() - t0) * 1000
-            if student_ids is None:
-                student_ids = students_df["student_id"].astype(str).tolist()
-            student_ids = list(dict.fromkeys(student_ids))
-            total_students = len(student_ids)
-            print(f"Total students: {total_students}")
-            print(f"Max workers: {max_workers}")
-            print(f"Download time: {download_ms/1000:.2f}s")
-            # --------------------------------------------------
-            # 02 Load config + prompts + client ONCE
-            # --------------------------------------------------
-            history_threshold, recent_k, feed_text_max_chars, include_recent_feeds, query_embedding_model_name = self._read_hyde_config(self.cfg)
-            prompts = self._load_prompts()
-            client = build_llm_client_from_yaml(
-                parameters_path=str(PROJECT_ROOT / "parameters" / "parameters.yaml")
+        student_ids = students["student_id"].astype(str).unique().tolist()
+        total_students = len(student_ids)
+        for i, student_id in enumerate(student_ids, start=1):
+            percent = (i / total_students) * 100
+            print(f"\nProcessing {i}/{total_students} ({percent:.2f}%) -> {student_id}")
+            result = self.single_hyde_generator2(
+                student_id,
+                students     = students,
+                interactions = interactions,
+                feeds_lookup = feeds_lookup
             )
-            now_iso = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-            counter = 0
-            # --------------------------------------------------
-            # 03 Thread workers (BATCHED)
-            # --------------------------------------------------
-            from concurrent.futures import ThreadPoolExecutor, as_completed
-            with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                for i in range(0, total_students, max_workers):
-                    batch = student_ids[i:i+max_workers]
-                    futures = {
-                        executor.submit(
-                            self._safe_single_student_fast,
-                            sid,
-                            students_df,
-                            interactions,
-                            feeds_lookup,
-                            prompts,
-                            client,
-                            now_iso,
-                            history_threshold,
-                            recent_k,
-                            feed_text_max_chars,
-                            include_recent_feeds,
-                        ): sid
-                        for sid in batch
-                    }
-                    for future in as_completed(futures):
-                        sid = futures[future]
-                        counter += 1
-                        print(f"[{counter}/{total_students}] Processing {sid}")
-                        try:
-                            result = future.result()
-                            if result["status"] == "Complete":
-                                updated.append(sid)
-                                if result["slow"]:
-                                    slow.append(sid)
-                                timing = result.get("timing", {})
-                                timing["student_id"] = sid
-                                timing["status"] = "done"
-                                timing_rows.append(timing)
-                                print(f"✅ {sid} completed")
-                            else:
-                                failed.append({
-                                    "student_id": sid,
-                                    "error": result.get("error", "Unknown")
-                                })
-                                print(f"❌ {sid} failed")
-                        except Exception as e:
-                            failed.append({
-                                "student_id": sid,
-                                "error": str(e)
-                            })
-                            print(f"❌ {sid} crashed → {str(e)}")
-        except Exception:
-            status = "Fail"
-            traceback.print_exc()
+            report_each_student.append(result)
+            timing_rows.append(result.get("timing", {}))
+            if result["status"] != "Complete":
+                failed.append(result)
+            slow.extend(result.get("slow", []))
+
         # --------------------------------------------------
-        # 04 Final report
+        # Upload report
         # --------------------------------------------------
-        timestamp = datetime.now().strftime("%y%m%d_%H%M")
+        thai_tz = timezone(timedelta(hours=7))
+        timestamp = datetime.now(thai_tz).strftime("%y%m%d_%H%M")
         self.cgs.create_folder(f"report_{timestamp}/")
         total_time = round(time.perf_counter() - t0_total, 2)
         report = {
             "run_metadata": {
-                "generated_at": datetime.now(timezone.utc).isoformat(),
-                "total_students": total_students,
-                "updated_count": len(updated),
+                "generated_at": datetime.now(thai_tz).isoformat(),
+                "total_students": len(student_ids),
+                "updated_count": len(student_ids) - len(failed),
                 "failed_count": len(failed),
                 "slow_count": len(slow),
-                "total_time_sec": total_time,
-                "max_workers": max_workers
+                "total_time_sec": total_time
             },
             "students": timing_rows,
             "failed": failed,
             "slow": slow
         }
-        json_path = f"hyde_batch_async_report_{timestamp}.json"
-        # with open(json_path, "w") as f:
-        #     json.dump(report, f, indent=2)
+        json_path = f"hyde_report_{timestamp}.json"
         self.cgs.upload_json(
             blob_path=f"report_{timestamp}/{json_path}",
             json_data=report
         )
-        print(f"JSON report saved → {json_path}")
-        print(f"Uploaded to datalake → report/{json_path}")
-        print("\nBatch Async Finished")
-        print("Updated:", len(updated))
-        print("Failed:", len(failed))
-        print("Slow:", len(slow))
-        print("Total Time (sec):", total_time)
-
+        print(f"Report uploaded → report_{timestamp}/{json_path}")
+        return report
+    
+# hg = HydeGenerator(
+#     bucket_name = "hyde-datalake-test",
+#     verbose     = 0
+# )
+# student_payload = {
+#   "student": {
+#     "student_id": "stu_p001",
+#     "current_status": "student",
+#     "education_level": "bachelor",
+#     "education_major": "computer science",
+#     "target_roles": ["data scientist"]
+#   },
+#   "interactions": [
+#     {
+#       "user_id": "stu_p001",
+#       "feed_id": "TH_F008",
+#       "event_type": "click",
+#       "ts": "2026-01-04T14:05:02Z",
+#       "dwell_ms": 1200
+#     }
+#   ],
+#   "feeds_lookup": {
+#     "TH_F008": "Machine learning introduction"
+#   }
+# }
+# hg.concurrent_of_single_student_generator()
+# hg.single_hyde_generator2("stu_p000")

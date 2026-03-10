@@ -4,17 +4,22 @@ bigquery:
   dataset: gold_layer
 
   # tables:
+  #   students: students_10k
+  #   interactions: interactions_320k
+  #   feeds: feeds_20k
+  # bucket: hyde-datalake-test
+
+  # tables:
   #   students: students_1k
   #   interactions: interactions_180k
   #   feeds: feeds_20k
+  # bucket: hyde-datalake-test
     
   tables:
     students: students
     interactions: interactions
     feeds: feeds
-  
   bucket: hyde-datalake-test
-  # bucket: hyde-datalake
 
 hyde_prompts:
   # Prompt-A: sparse/medium history

@@ -138,60 +138,72 @@ hg = HydeGenerator(
     bucket_name = bucket_name,
     verbose     = 0
 )
-### ----------     API:2.2       ---------- ###
+### ----------     API:2.1       ---------- ###
 @app.post(
     "/hyde/students/{student_id}", 
     tags=["Hyde Generator"],
-    description="API 2.2 : Generate HyDE bundle for a single student"
+    description="API 2.1 : Generate HyDE bundle for a single student"
 )
 def generate_student_recommendation(student_id):
-    status = hg.single_student_generator(student_id=student_id)
+    status = hg.single_hyde_generator2(student_id=student_id)
     return {
         "student_id":student_id,
         "response"  :status
     }
 
-
-### ----------     API:2.1       ---------- ###
+### ----------     API:2.x       ---------- ###
 @app.get(
-    "/hyde/students/batch", 
+    "/hyde/students/sequential", 
     tags=["Hyde Generator"],
-    description="API 2.1 : Generate recommendations for all students (batch)"
+    description="API 2.1 : Generate HyDE bundle for a single student"
 )
-def generate_batch_recommendations():
-    student_id_updated, status = hg.batch_student_generator()
+def sequential_of_single_hyde_generator():
+    report_each_student = hg.sequential_of_single_student_generator()
     return {
-        "student_id":student_id_updated,
-        "response"  :status
+        "report_each_student":report_each_student
     }
 
 
+# ### ----------     API:2.2       ---------- ###
+# @app.get(
+#     "/hyde/students/batch", 
+#     tags=["Hyde Generator"],
+#     description="API 2.2 : Generate recommendations for all students (batch)"
+# )
+# def generate_batch_recommendations():
+#     student_id_updated, status = hg.batch_student_generator()
+#     return {
+#         "student_id":student_id_updated,
+#         "response"  :status
+#     }
 
 
 
-### ---------- API:2.3 ---------- ###
-import threading
-@app.post(
-    "/hyde/batch",
-    tags=["Deving"]
-)
-def generate_hyde_for_all_students(max_workers: int = 5):
-    """
-    Trigger batch job to generate HyDE for ALL students in BigQuery.
-    - student_ids is always None (meaning: fetch from BQ)
-    - runs in background thread so API returns immediately
-    """
 
-    def _run():
-        hg.batch_student_async(student_ids=None, max_workers=max_workers)
 
-    thread = threading.Thread(target=_run, daemon=True)
-    thread.start()
+# ### ---------- API:2.3 ---------- ###
+# import threading
+# @app.post(
+#     "/hyde/batch",
+#     tags=["Deving"]
+# )
+# def generate_hyde_for_all_students(max_workers: int = 5):
+#     """
+#     Trigger batch job to generate HyDE for ALL students in BigQuery.
+#     - student_ids is always None (meaning: fetch from BQ)
+#     - runs in background thread so API returns immediately
+#     """
 
-    return {
-        "status": "Batch started",
-        "max_workers": max_workers
-    }
+#     def _run():
+#         hg.batch_student_async(student_ids=None, max_workers=max_workers)
+
+#     thread = threading.Thread(target=_run, daemon=True)
+#     thread.start()
+
+#     return {
+#         "status": "Batch started",
+#         "max_workers": max_workers
+#     }
 
 # ### ----------   Fetch results   ---------- ###
 # ### ----------     API:3.1       ---------- ###
