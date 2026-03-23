@@ -9,17 +9,17 @@ bigquery:
   #   feeds: feeds_20k
   # bucket: hyde-datalake-test
 
-  # tables:
-  #   students: students_1k
-  #   interactions: interactions_180k
-  #   feeds: feeds_20k
-  # bucket: hyde-datalake-test
-    
   tables:
-    students: students
-    interactions: interactions
-    feeds: feeds
-  bucket: hyde-datalake-test
+    students: students_1k
+    interactions: interactions_180k
+    feeds: feeds_20k
+  bucket: hyde-datalake-feeds
+    
+  # tables:
+  #   students: students
+  #   interactions: interactions
+  #   feeds: feeds
+  # bucket: hyde-datalake-test
 
 hyde_prompts:
   # Prompt-A: sparse/medium history
@@ -43,8 +43,8 @@ hyde_prompts:
     - If HistorySummary is empty or missing, Q2 MUST be role_or_skill (do NOT invent history themes)
   
     LENGTH RULE (STRICT):
-    - If output_language = "en": 6–12 words
-    - If output_language = "th": 25–70 ตัวอักษร
+    - If output_language = "en": 6-12 words
+    - If output_language = "th": 25-70 ตัวอักษร
   
     SLOT PLAN (EXACTLY 5):
     - Q1: role_or_skill (from UserContext) weight=1.0
@@ -93,8 +93,8 @@ hyde_prompts:
     - Query style: search-style keywords (no punctuation, no quotes)
 
     LENGTH RULE (STRICT):
-    - If output_language = "en": each query_text must be 6–12 words
-    - If output_language = "th": each query_text must be 25–70 characters
+    - If output_language = "en": each query_text must be 6-12 words
+    - If output_language = "th": each query_text must be 25-70 characters
 
     SLOT PLAN (EXACTLY 5):
     - Fixed (3 queries):
@@ -142,8 +142,8 @@ hyde_prompts:
     - Query style: search-style keywords (no punctuation, no quotes)
 
     LENGTH RULE (STRICT):
-    - If output_language = "en": each query_text must be 6–12 words
-    - If output_language = "th": each query_text must be 25–70 characters
+    - If output_language = "en": each query_text must be 6-12 words
+    - If output_language = "th": each query_text must be 25-70 characters
 
     SLOT PLAN (EXACTLY 5):
     - Fixed (3 queries):

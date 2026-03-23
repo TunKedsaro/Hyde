@@ -1,5 +1,7 @@
-import json
-import re
+# import json
+# import re
+# from src.functions.utils.cloudstorage import GoogleCloudStorage
+
 import os
 
 from time import time
@@ -9,7 +11,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from google import genai
 
-from src.functions.utils.cloudstorage import GoogleCloudStorage
 from src.functions.core.hydegenerator import HydeGenerator
 import logging
 
@@ -21,11 +22,11 @@ logging.getLogger("google").setLevel(logging.WARNING)
 
 app = FastAPI(
     title="Hyde Feed and Cource recommentdation",
-    version="1.4.0",
+    version="1.5.0",
     description=(
-        "Hyde Feed and Cource recommentdation (In progress krub)"
+        "Hyde Feed and Cource recommentdation (Ready to review)"
         "<br>"
-        f"Last time Update : 2026-02-24 00:29"
+        f"Last time Update : 2026-03-23 12:32"
         "<br>"
         "Repo : https://github.com/TunKedsaro/Hyde"
     ),
@@ -47,6 +48,7 @@ app.add_middleware(
 config_path = Path(__file__).resolve().parent / "parameters" / "prompts.yaml"
 with open(config_path, "r", encoding="utf-8") as f:
     config = yaml.safe_load(f)
+
 bucket_name = config["bigquery"]["bucket"]
 
 ### ---------- Health & Metadata ---------- ###
@@ -151,17 +153,30 @@ def generate_student_recommendation(student_id):
         "response"  :status
     }
 
-### ----------     API:2.x       ---------- ###
+### ----------     API:2.2       ---------- ###
 @app.get(
     "/hyde/students/sequential", 
     tags=["Hyde Generator"],
-    description="API 2.1 : Generate HyDE bundle for a single student"
+    description="API 2.2 : Generate HyDE bundle every students in bigquery"
 )
 def sequential_of_single_hyde_generator():
     report_each_student = hg.sequential_of_single_student_generator()
     return {
         "report_each_student":report_each_student
     }
+
+
+# ### ----------     API:2.x       ---------- ###
+# @app.get(
+#     "/hyde/students/sequential3", 
+#     tags=["Hyde Generator"],
+#     description="API 2.3 : Sequential with load parameter onece"
+# )
+# def sequential_of_single_hyde_generator3():
+#     report_each_student = hg.sequential_of_single_student_generator3()
+#     return {
+#         "report_each_student":report_each_student
+#     }
 
 
 # ### ----------     API:2.2       ---------- ###

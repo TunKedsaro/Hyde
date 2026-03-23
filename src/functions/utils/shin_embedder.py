@@ -2,8 +2,7 @@ import os
 import numpy as np
 from google import genai
 
-# TODO : write this code in core
-def embed_texts_gemini(texts:list[str],output_dim:int=768,task_type: str = "RETRIEVAL_DOCUMENT")->np.ndarray:
+def embed_texts_gemini(texts:list[str], output_dim:int=768, task_type: str = "RETRIEVAL_DOCUMENT", embedding_model:str = "gemini-embedding-001")->np.ndarray:
     if not texts:
         return np.zeros((0,output_dim or 0), dtype=np.float32)
     # step01 : API key
@@ -16,7 +15,7 @@ def embed_texts_gemini(texts:list[str],output_dim:int=768,task_type: str = "RETR
     for raw in texts:
         text = raw.strip() or " "
         resp = client.models.embed_content(
-            model="gemini-embedding-001",
+            model=embedding_model,
             contents=text,
             config={"task_type": task_type},
         )

@@ -29,10 +29,10 @@ app:
 # --------------------------------------------------------------------------------------
 # Raw input data locations (POC only)
 # --------------------------------------------------------------------------------------
-data:
-  feeds_path: data/feeds.jsonl
-  students_path: data/students.csv
-  interactions_path: data/interactions.csv
+# data:
+#   feeds_path: data/feeds.jsonl
+#   students_path: data/students.csv
+#   interactions_path: data/interactions.csv
   # NOTE (POC):
   # - These paths are used only in batch/offline pipelines
   # - Online serving NEVER reads raw CSV/JSON directly
@@ -41,9 +41,9 @@ data:
 # --------------------------------------------------------------------------------------
 # Artifact locations (USED in POC)
 # --------------------------------------------------------------------------------------
-artifacts:
-  feed_index_dir: artifacts/feed_index
-  user_query_bundles_dir: artifacts/user_query_bundles
+# artifacts:
+#   feed_index_dir: artifacts/feed_index
+#   user_query_bundles_dir: artifacts/user_query_bundles
   # USED:
   # - feed_index_dir → FAISS index + feeds_meta.jsonl
   # - user_query_bundles_dir → cached HyDE queries + embeddings
@@ -60,6 +60,8 @@ llm:
   # model_name: gemini-2.5-flash
   # model_name: gemini-3-flash-preview
   model_name: gemini-3.1-flash-lite-preview
+  embedding_model : gemini-embedding-001
+  # embedding_model : gemini-embedding-2-preview
   max_output_tokens: 2048
   temperature: 0.2
   slow_time: 30
@@ -97,24 +99,24 @@ hyde:
 # --------------------------------------------------------------------------------------
 # Retrieval configuration (USED in POC)
 # --------------------------------------------------------------------------------------
-retrieval:
-  top_k_per_query: 30
-  max_candidates: 200
-  agg_mode: WEIGHTED_MAX          # WEIGHTED_MAX | WEIGHTED_MEAN
-  recency_half_life_days: 30.0
-  include_feed_header: true       # include feed_header field in candidates
-  print_feed_header: true         # CLI-only (used in pipeline_3_gold_validate)
-  feed_header_keys: ["title", "header", "name", "feed_title"]
+# retrieval:
+#   top_k_per_query: 30
+#   max_candidates: 200
+#   agg_mode: WEIGHTED_MAX          # WEIGHTED_MAX | WEIGHTED_MEAN
+#   recency_half_life_days: 30.0
+#   include_feed_header: true       # include feed_header field in candidates
+#   print_feed_header: true         # CLI-only (used in pipeline_3_gold_validate)
+#   feed_header_keys: ["title", "header", "name", "feed_title"]
 
-  # --------------------
-  # Exclude-seen policy
-  # --------------------
-  exclude_seen:
-    enabled: true
-    interactions_path: data/interactions.csv
-    event_types: ["view", "click", "like", "share", "comment"]
-    window_days: 30
-    max_unique: 5000
+#   # --------------------
+#   # Exclude-seen policy
+#   # --------------------
+#   exclude_seen:
+#     enabled: true
+#     interactions_path: data/interactions.csv
+#     event_types: ["view", "click", "like", "share", "comment"]
+#     window_days: 30
+#     max_unique: 5000
 
     # USED:
     # - exclude_seen.enabled → enforced in pipeline_3_online_retrieval
@@ -129,10 +131,10 @@ retrieval:
 # --------------------------------------------------------------------------------------
 # Scoring weights (USED in POC)
 # --------------------------------------------------------------------------------------
-scoring:
-  similarity_weight: 0.80
-  freshness_weight: 0.15
-  coverage_weight: 0.05
+# scoring:
+#   similarity_weight: 0.80
+#   freshness_weight: 0.15
+#   coverage_weight: 0.05
   # USED:
   # - These weights are applied in online_score_aggregation
   #
