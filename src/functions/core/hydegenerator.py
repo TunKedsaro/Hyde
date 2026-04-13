@@ -17,6 +17,7 @@ from src.functions.core.history import build_history_summary
 from src.functions.utils.cloudstorage import GoogleCloudStorage
 from src.functions.utils.bigquery import DataQuery
 from src.functions.utils.shin_embedder import embed_texts_gemini
+from src.functions.utils.cost_logger import append_cost_log
 
 # from src.functions.utils.text_embeddings import GoogleEmbeddingModel
 # import os
@@ -234,6 +235,31 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             json_data=bundle
         )
 
+    def _estimate_embedding_cost_usd(
+        self,
+        texts: List[str],
+        model_name: str,
+    ) -> float:
+        """
+        Temporary embedding cost estimator.
+        Replace with real Gemini embedding pricing.
+        """
+        total_chars = sum(len(t or "") for t in texts)
+
+        # TODO: replace with real pricing
+        pricing = {
+            "gemini-embedding-001": {
+                "per_1k_chars": 0.00005,
+            }
+        }
+
+        model_price = pricing.get(
+            model_name,
+            {"per_1k_chars": 0.00005},
+        )
+
+        return (total_chars / 1000) * model_price["per_1k_chars"]
+
     def single_hyde_generator2(self, 
                                 student_id:str,
                                 students = None,
@@ -327,7 +353,15 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             # 7. LLM
             # ----------------------------
             t0 = time.perf_counter()
-            hyde_json = client.generate_json(prompt)
+
+            hyde_json = client.generate_json(
+                prompt,
+                extra_log={
+                    "student_id": student_id,
+                    "pipeline": "hyde_generator",
+                },
+            )
+
             llm_time = time.perf_counter() - t0
             timing["llm_call_ms"] = round(llm_time * 1000,2)
             slow_time = self.cfg["llm"]["slow_time"]
@@ -338,6 +372,7 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
             # 8. Extract queries
             # ----------------------------       
             hyde_query_text = self._extract_hyde_query_texts(hyde_json)
+
             # ----------------------------
             # 9. Embedding
             # ----------------------------   
@@ -355,6 +390,26 @@ class HydeGenerator(GoogleCloudStorage,DataQuery):
                     raise ValueError(f"Invalid embedding shape {emb.shape}")
             else:
                 emb = np.zeros((0, expected_dim), dtype=np.float32)
+            
+            embedding_latency_s = time.perf_counter() - t0
+            timing["embedding_ms"] = round(embedding_latency_s * 1000, 2)
+
+            embedding_cost_usd = self._estimate_embedding_cost_usd(
+                texts=hyde_query_text,
+                model_name=embedding_model,
+            )
+
+            append_cost_log(
+                {
+                    "event_type": "embedding",
+                    "student_id": student_id,
+                    "model_name": embedding_model,
+                    "num_texts": len(hyde_query_text),
+                    "total_chars": sum(len(t or "") for t in hyde_query_text),
+                    "latency_s": round(embedding_latency_s, 4),
+                    "estimated_cost_usd": embedding_cost_usd,
+                }
+            )
             # ----------------------------
             # 10. Upload
             # ----------------------------

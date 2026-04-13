@@ -54,6 +54,7 @@ from tenacity import (
 )
 
 from src.functions.utils.logging import get_logger
+from src.functions.utils.cost_logger import append_cost_log
 
 logger = get_logger(__name__)
 
@@ -300,7 +301,35 @@ def _fmt_tok(x: Optional[int]) -> str:
     """Pretty-format token usage for logs."""
     return str(x) if x is not None else "NA"
 
+def _estimate_llm_cost_usd(
+    input_tokens: Optional[int],
+    output_tokens: Optional[int],
+    model_name: str,
+) -> float:
+    """
+    Temporary cost estimator.
+    Replace these rates with the real Gemini pricing you use.
+    """
+    input_tokens = input_tokens or 0
+    output_tokens = output_tokens or 0
 
+    # TODO: replace with real pricing
+    pricing = {
+        "gemini-3.1-flash-lite-preview": {
+            "input_per_1k": 0.0001,
+            "output_per_1k": 0.0002,
+        }
+    }
+
+    model_price = pricing.get(
+        model_name,
+        {"input_per_1k": 0.0001, "output_per_1k": 0.0002},
+    )
+
+    input_cost = (input_tokens / 1000) * model_price["input_per_1k"]
+    output_cost = (output_tokens / 1000) * model_price["output_per_1k"]
+
+    return input_cost + output_cost
 # =============================================================================
 # Gemini JSON client
 # =============================================================================
@@ -353,7 +382,12 @@ class GeminiJsonClient:
             before_sleep=before_sleep_log(logger, logging.WARNING),
         )
 
-    def generate_json(self, prompt: str) -> Dict[str, Any]:
+    # def generate_json(self, prompt: str) -> Dict[str, Any]:
+    def generate_json(
+    self,
+    prompt: str,
+    extra_log: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
         """
         Generate a JSON object from the LLM.
 
@@ -412,6 +446,27 @@ class GeminiJsonClient:
 
             latency_s = time.perf_counter() - t0
             in_tok, out_tok = _extract_token_usage(resp)
+
+            estimated_cost_usd = _estimate_llm_cost_usd(
+                input_tokens=in_tok,
+                output_tokens=out_tok,
+                model_name=self.model_name,
+            )
+
+            payload = {
+                "event_type": "llm",
+                "model_name": self.model_name,
+                "input_tokens": in_tok,
+                "output_tokens": out_tok,
+                "latency_s": round(latency_s, 4),
+                "estimated_cost_usd": estimated_cost_usd,
+            }
+
+            if extra_log:
+                payload.update(extra_log)
+
+            append_cost_log(payload)
+
 
             # Prefer structured extraction (SDK-parsed or candidate parts).
             structured = _extract_json_from_response(resp)
